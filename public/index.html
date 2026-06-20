@@ -13,8 +13,8 @@
           <p class="eyebrow">Anketa · 6 návrhů · 0-100 bodů</p>
           <h1 id="pageTitle">Ohodnoťte styl aplikace Evidence revizí</h1>
           <p class="lead">
-            Prohlédněte si každý návrh a dejte mu vlastní skóre. Výsledky se ukládají anonymně
-            podle věkové kategorie, aby bylo vidět, který směr je srozumitelný pro různé skupiny.
+            Prohlédněte si každý návrh a dejte mu vlastní skóre. Výsledky se ukládají pseudonymně
+            pod náhodným identifikátorem a věkovou kategorií. IP adresa slouží k omezení frekvence odesílání.
           </p>
         </div>
         <div class="progress-card" aria-live="polite">
@@ -73,7 +73,12 @@
           <button class="secondary-button" id="closePreview" type="button">Zavřít</button>
         </div>
       </div>
-      <iframe id="previewFrame" title="Náhled designu"></iframe>
+      <iframe
+        id="previewFrame"
+        title="Náhled designu"
+        sandbox="allow-scripts"
+        referrerpolicy="no-referrer"
+      ></iframe>
     </div>
 
     <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>

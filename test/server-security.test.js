@@ -3,10 +3,14 @@ const assert = require("node:assert/strict");
 
 const SERVER_PATH = require.resolve("../server");
 const DEFAULT_ENV = {
-  ADMIN_TOKEN: "0123456789abcdef0123456789abcdef"
+  ADMIN_TOKEN: "0123456789abcdef0123456789abcdef",
+  NODE_ENV: "test"
 };
 const ENV_KEYS = [
+  "NODE_ENV",
   "ADMIN_TOKEN",
+  "SURVEY_COOKIE_SECRET",
+  "ADMIN_SESSION_TTL_SECONDS",
   "HOST",
   "DATABASE_URL",
   "ALLOWED_HOSTS",
@@ -17,6 +21,7 @@ const ENV_KEYS = [
   "PGSSLCAFILE",
   "PGSSLROOTCERT",
   "SUBMISSION_RATE_LIMIT",
+  "ADMIN_LOGIN_RATE_LIMIT",
   "ADMIN_RATE_LIMIT"
 ];
 
@@ -84,6 +89,35 @@ test("admin token is accepted only through x-admin-token header", async () => {
   assert.equal(headerResponse.status, 503);
   assert.equal(headerResponse.headers.get("cache-control"), "no-store");
   assert.match(headerResponse.headers.get("vary"), /x-admin-token/i);
+});
+
+test("admin browser login exchanges the token for an HttpOnly session cookie", async () => {
+  const app = loadApp();
+  const loginResponse = await request(app, "/api/admin/session", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ token: "0123456789abcdef0123456789abcdef" })
+  });
+
+  assert.equal(loginResponse.status, 200);
+  const cookie = loginResponse.headers.get("set-cookie");
+  assert.match(cookie, /styles_admin_session=/);
+  assert.match(cookie, /HttpOnly/i);
+  assert.match(cookie, /SameSite=Strict/i);
+  assert.doesNotMatch(cookie, /0123456789abcdef/);
+
+  const sessionResponse = await request(app, "/api/results", {
+    headers: { cookie: cookie.split(";", 1)[0] }
+  });
+  assert.equal(sessionResponse.status, 503);
+
+  const crossSiteResponse = await request(app, "/api/results", {
+    headers: {
+      cookie: cookie.split(";", 1)[0],
+      "sec-fetch-site": "cross-site"
+    }
+  });
+  assert.equal(crossSiteResponse.status, 401);
 });
 
 test("submission endpoint rejects non-json and malformed json", async () => {

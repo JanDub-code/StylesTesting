@@ -71,7 +71,7 @@ run_sudo chown -R "$APP_USER:$APP_USER" "$APP_DIR"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   run_sudo install -m 0600 -o root -g root "$RELEASE_DIR/.env.example" "$ENV_FILE"
-  echo "Created $ENV_FILE from .env.example. Fill DATABASE_URL, ADMIN_TOKEN and ALLOWED_HOSTS, then run this script again." >&2
+  echo "Created $ENV_FILE from .env.example. Fill DATABASE_URL, distinct ADMIN_TOKEN and SURVEY_COOKIE_SECRET values, and ALLOWED_HOSTS, then run this script again." >&2
   exit 1
 fi
 

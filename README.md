@@ -1,6 +1,6 @@
 # Anketa designu Evidence revizi
 
-Jednoducha Node/Express appka pro anonymni hodnoceni sesti statickych designovych iteraci.
+Jednoducha Node/Express appka pro pseudonymni hodnoceni sesti statickych designovych iteraci.
 
 ## Spusteni lokalne
 
@@ -17,7 +17,8 @@ Pro realne ukladani nastavte:
 
 ```bash
 DATABASE_URL=postgres://user:password@host:5432/database
-ADMIN_TOKEN=dlouhy-nahodny-token
+ADMIN_TOKEN=$(openssl rand -hex 32)
+SURVEY_COOKIE_SECRET=$(openssl rand -hex 32)
 PORT=3000
 HOST=127.0.0.1
 ```
@@ -31,11 +32,13 @@ Dalsi produkcni volby jsou v `.env.example`:
 - `ENFORCE_HTTPS=true` volitelne pro HTTPS redirect na aplikacni vrstve po zprovozneni proxy.
 - `ALLOWED_HOSTS=example.com,www.example.com` pro kontrolu Host headeru.
 - `SUBMISSION_RATE_LIMIT` a `ADMIN_RATE_LIMIT` pro jednoduche IP rate limiting.
+- `ADMIN_LOGIN_RATE_LIMIT` pro omezeni pokusu o prihlaseni.
+- `ADMIN_SESSION_TTL_SECONDS` pro dobu platnosti admin relace.
 - `PGSSLMODE=require`, `PGSSLREJECTUNAUTHORIZED=true` a volitelne `PGSSLCAFILE`/`PGSSLROOTCERT` pro TLS k Postgresu.
 
 ## Security baseline
 
-Aplikace nastavuje zakladni bezpecnostni hlavicky vcetne CSP, `nosniff`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy` a HSTS pri HTTPS. Admin API pouziva jen `x-admin-token` header, ne token v URL. Public odesilani i admin endpointy maji jednoduchy in-memory rate limit. Logovani nebylo rozsireno.
+Aplikace nastavuje zakladni bezpecnostni hlavicky vcetne CSP, `nosniff`, `Referrer-Policy`, `X-Frame-Options`, `Permissions-Policy` a HSTS pri HTTPS. Admin formular vymeni token za casove omezenou `HttpOnly`, `Secure` a `SameSite=Strict` cookie; token se neuklada do weboveho uloziste. Pro skripty a CLI zustava podporovany `x-admin-token` header. Pseudonymni identita hlasu je podepsana serverem a klient ji nemuze libovolne prepsat. IP adresa se v aplikaci pouziva pro rate limiting a reverzni proxy ji muze uchovavat v provoznich logach. Public odesilani i admin endpointy maji jednoduchy in-memory rate limit.
 
 ## Admin
 
@@ -55,7 +58,7 @@ Verejna anketa globalni vysledky nezobrazuje, aby neovlivnovala dalsi hlasujici.
    sudo bash scripts/deploy.sh
    ```
 
-   Pri prvnim spusteni skript vytvori `/etc/styles-testing-survey.env` z `.env.example` a skonci. Doplnte realne hodnoty (`DATABASE_URL`, silny `ADMIN_TOKEN`, `ALLOWED_HOSTS`) a spustte skript znovu.
+   Pri prvnim spusteni skript vytvori `/etc/styles-testing-survey.env` z `.env.example` a skonci. Doplnte realne hodnoty (`DATABASE_URL`, rozdilny silny `ADMIN_TOKEN` a `SURVEY_COOKIE_SECRET`, `ALLOWED_HOSTS`) a spustte skript znovu. Produkcni start placeholdery a slabe hodnoty odmitne.
 
 3. Nginx konfiguraci nainstalujete:
 

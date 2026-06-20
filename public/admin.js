@@ -1,22 +1,16 @@
 const tokenForm = document.querySelector("#tokenForm");
 const tokenInput = document.querySelector("#adminToken");
 const exportButton = document.querySelector("#exportCsv");
+const logoutButton = document.querySelector("#logoutButton");
 const results = document.querySelector("#results");
 const submissionCount = document.querySelector("#submissionCount");
 const generatedAt = document.querySelector("#generatedAt");
 const summaryRows = document.querySelector("#summaryRows");
 const ageRows = document.querySelector("#ageRows");
 const toast = document.querySelector("#toast");
-const tokenKey = "stylesSurveyAdminToken";
-
-tokenInput.value = localStorage.getItem(tokenKey) || "";
 
 tokenForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  await loadResults();
-});
-
-exportButton.addEventListener("click", async () => {
   const token = tokenInput.value.trim();
   if (!token) {
     showToast("Zadejte admin token.");
@@ -24,9 +18,26 @@ exportButton.addEventListener("click", async () => {
   }
 
   try {
-    const response = await fetch("/api/export.csv", {
-      headers: { "x-admin-token": token }
+    const response = await fetch("/api/admin/session", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ token })
     });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(data.error || "Přihlášení se nepodařilo.");
+    }
+
+    tokenInput.value = "";
+    await loadResults();
+  } catch (error) {
+    showToast(error.message || "Přihlášení se nepodařilo.");
+  }
+});
+
+exportButton.addEventListener("click", async () => {
+  try {
+    const response = await fetch("/api/export.csv");
     if (!response.ok) {
       const text = await response.text();
       throw new Error(text || "CSV export se nepodařilo stáhnout.");
@@ -44,19 +55,17 @@ exportButton.addEventListener("click", async () => {
   }
 });
 
-async function loadResults() {
-  const token = tokenInput.value.trim();
-  if (!token) {
-    showToast("Zadejte admin token.");
-    return;
-  }
+logoutButton.addEventListener("click", async () => {
+  await fetch("/api/admin/session", { method: "DELETE" }).catch(() => {});
+  exportButton.disabled = true;
+  logoutButton.hidden = true;
+  results.hidden = true;
+  showToast("Admin relace byla ukončena.");
+});
 
-  localStorage.setItem(tokenKey, token);
-
+async function loadResults({ silent = false } = {}) {
   try {
-    const response = await fetch("/api/results", {
-      headers: { "x-admin-token": token }
-    });
+    const response = await fetch("/api/results");
     const data = await response.json().catch(() => ({}));
     if (!response.ok) {
       throw new Error(data.error || "Výsledky se nepodařilo načíst.");
@@ -64,10 +73,16 @@ async function loadResults() {
 
     renderResults(data);
     exportButton.disabled = false;
+    logoutButton.hidden = false;
     results.hidden = false;
+    return true;
   } catch (error) {
     exportButton.disabled = true;
-    showToast(error.message || "Výsledky se nepodařilo načíst.");
+    logoutButton.hidden = true;
+    if (!silent) {
+      showToast(error.message || "Výsledky se nepodařilo načíst.");
+    }
+    return false;
   }
 }
 
@@ -124,3 +139,5 @@ function escapeHtml(value) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
+
+loadResults({ silent: true });

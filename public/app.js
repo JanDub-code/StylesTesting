@@ -8,7 +8,6 @@ const state = {
 };
 
 const storageKeys = {
-  clientId: "stylesSurveyClientId",
   displayOrder: "stylesSurveyDisplayOrder",
   draft: "stylesSurveyDraft"
 };
@@ -70,7 +69,6 @@ elements.form.addEventListener("submit", async (event) => {
   elements.submitButton.textContent = "Odesílám...";
 
   const payload = {
-    clientId: getClientId(),
     ageRange: state.selectedAge,
     displayOrder: state.displayOrder,
     scores: state.designs.map((design) => ({
@@ -223,7 +221,7 @@ function updateProgress() {
   elements.submitButton.disabled = !ready;
   elements.submitTitle.textContent = ready ? "Připraveno k odeslání" : "Ještě není vyplněno";
   elements.submitDetail.textContent = ready
-    ? "Hodnocení uložíme anonymně do databáze."
+    ? "Hodnocení uložíme pseudonymně do databáze."
     : buildMissingText(missingAge, missingScores);
 }
 
@@ -289,17 +287,6 @@ function resolveDisplayOrder(designs) {
   const shuffled = [...designIds].sort(() => Math.random() - 0.5);
   localStorage.setItem(storageKeys.displayOrder, JSON.stringify(shuffled));
   return shuffled;
-}
-
-function getClientId() {
-  const saved = localStorage.getItem(storageKeys.clientId);
-  if (saved) {
-    return saved;
-  }
-
-  const generated = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  localStorage.setItem(storageKeys.clientId, generated);
-  return generated;
 }
 
 function loadDraft() {

@@ -8,11 +8,16 @@ const { AGE_RANGES, DESIGNS, validateSubmission, csvEscape } = require("./lib/su
 const app = express();
 const port = Number(process.env.PORT || 3000);
 const listenHost = (process.env.HOST || "").trim();
+const nodeEnv = (process.env.NODE_ENV || "").trim().toLowerCase();
 const adminToken = (process.env.ADMIN_TOKEN || "").trim();
+const surveyCookieSecret = (process.env.SURVEY_COOKIE_SECRET || "").trim() || adminToken || crypto.randomBytes(32).toString("hex");
 const databaseUrl = process.env.DATABASE_URL || "";
 const rootDir = __dirname;
 const enforceHttpsEnabled = isEnabled(process.env.ENFORCE_HTTPS);
 const allowedHosts = parseList(process.env.ALLOWED_HOSTS).map((allowedHost) => allowedHost.toLowerCase());
+const adminSessionTtlSeconds = parsePositiveInteger(process.env.ADMIN_SESSION_TTL_SECONDS, 8 * 60 * 60);
+const adminSessionCookieName = "styles_admin_session";
+const surveyClientCookieName = "styles_survey_client";
 
 configureTrustProxy(app, process.env.TRUST_PROXY);
 
@@ -35,12 +40,18 @@ const adminRateLimit = createRateLimiter({
   max: parseNonNegativeInteger(process.env.ADMIN_RATE_LIMIT, 60),
   message: "Prilis mnoho admin pozadavku. Zkuste to prosim pozdeji."
 });
+const adminLoginRateLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: parseNonNegativeInteger(process.env.ADMIN_LOGIN_RATE_LIMIT, 10),
+  message: "Prilis mnoho pokusu o prihlaseni. Zkuste to prosim pozdeji."
+});
 
 app.disable("x-powered-by");
 app.use(validateHost);
 app.use(enforceHttps);
 app.use(securityHeaders);
 app.use("/api/submissions", submissionRateLimit);
+app.use("/api/admin/session", adminLoginRateLimit);
 app.use(["/api/results", "/api/export.csv"], adminRateLimit);
 app.use(express.json({ limit: "80kb", type: isJsonContentType }));
 app.use(express.static(path.join(rootDir, "public"), {
@@ -75,6 +86,43 @@ app.get("/api/designs", (_req, res) => {
   });
 });
 
+app.post("/api/admin/session", requireJson, (req, res) => {
+  res.setHeader("cache-control", "no-store");
+
+  if (!adminToken) {
+    res.status(503).json({ error: "Admin pristup neni nakonfigurovan." });
+    return;
+  }
+
+  const token = typeof req.body?.token === "string" ? req.body.token.trim() : "";
+  if (!safeTokenEquals(token, adminToken)) {
+    res.status(401).json({ error: "Neplatne prihlasovaci udaje." });
+    return;
+  }
+
+  const expiresAt = Math.floor(Date.now() / 1000) + adminSessionTtlSeconds;
+  const payload = `${expiresAt}.${crypto.randomBytes(18).toString("base64url")}`;
+  const session = signCookiePayload(payload, adminToken);
+  setCookie(res, adminSessionCookieName, session, {
+    httpOnly: true,
+    maxAge: adminSessionTtlSeconds,
+    path: "/api",
+    sameSite: "Strict",
+    secure: shouldUseSecureCookies(req)
+  });
+  res.json({ ok: true, expiresAt: new Date(expiresAt * 1000).toISOString() });
+});
+
+app.delete("/api/admin/session", (req, res) => {
+  res.setHeader("cache-control", "no-store");
+  clearCookie(res, adminSessionCookieName, {
+    path: "/api",
+    sameSite: "Strict",
+    secure: shouldUseSecureCookies(req)
+  });
+  res.status(204).end();
+});
+
 app.post("/api/submissions", requireJson, async (req, res, next) => {
   if (!pool) {
     res.status(503).json({
@@ -83,7 +131,9 @@ app.post("/api/submissions", requireJson, async (req, res, next) => {
     return;
   }
 
-  const validation = validateSubmission(req.body || {});
+  const clientId = getOrCreateSurveyClientId(req, res);
+  const input = req.body && typeof req.body === "object" && !Array.isArray(req.body) ? req.body : {};
+  const validation = validateSubmission({ ...input, clientId });
   if (!validation.valid) {
     res.status(400).json({
       error: "Hodnoceni neni kompletni. Zkontrolujte vekovou kategorii a skore u vsech navrhu."
@@ -234,19 +284,49 @@ app.get("/admin", (_req, res) => {
 function requireAdmin(req, res, next) {
   res.setHeader("cache-control", "no-store");
   res.vary("x-admin-token");
+  res.vary("cookie");
 
   if (!adminToken) {
-    res.status(503).json({ error: "ADMIN_TOKEN neni nastaven." });
+    res.status(503).json({ error: "Admin pristup neni nakonfigurovan." });
     return;
   }
 
   const token = req.get("x-admin-token") || "";
-  if (!safeTokenEquals(token, adminToken)) {
-    res.status(401).json({ error: "Neplatny admin token." });
+  if (token && safeTokenEquals(token, adminToken)) {
+    next();
+    return;
+  }
+
+  const cookies = parseCookies(req.get("cookie"));
+  const sessionPayload = verifySignedCookie(cookies[adminSessionCookieName], adminToken);
+  const expiresAt = Number(sessionPayload?.split(".", 1)[0]);
+  const fetchSite = (req.get("sec-fetch-site") || "").toLowerCase();
+  const trustedFetchContext = !fetchSite || fetchSite === "same-origin" || fetchSite === "none";
+
+  if (!sessionPayload || !Number.isSafeInteger(expiresAt) || expiresAt <= Math.floor(Date.now() / 1000) || !trustedFetchContext) {
+    res.status(401).json({ error: "Admin relace neni platna." });
     return;
   }
 
   next();
+}
+
+function getOrCreateSurveyClientId(req, res) {
+  const cookies = parseCookies(req.get("cookie"));
+  const signedClientId = verifySignedCookie(cookies[surveyClientCookieName], surveyCookieSecret);
+  if (signedClientId && /^[a-f0-9-]{36}$/.test(signedClientId)) {
+    return signedClientId;
+  }
+
+  const clientId = crypto.randomUUID();
+  setCookie(res, surveyClientCookieName, signCookiePayload(clientId, surveyCookieSecret), {
+    httpOnly: true,
+    maxAge: 365 * 24 * 60 * 60,
+    path: "/api/submissions",
+    sameSite: "Lax",
+    secure: shouldUseSecureCookies(req)
+  });
+  return clientId;
 }
 
 async function ensureSchema() {
@@ -429,8 +509,9 @@ function securityHeaders(req, res, next) {
     res.setHeader("strict-transport-security", "max-age=15552000; includeSubDomains");
   }
 
-  if (req.path === "/admin" || req.path === "/admin.html" || req.path.startsWith("/api/results") || req.path.startsWith("/api/export")) {
+  if (req.path === "/admin" || req.path === "/admin.html" || req.path.startsWith("/api/admin") || req.path.startsWith("/api/results") || req.path.startsWith("/api/export")) {
     res.setHeader("x-robots-tag", "noindex, nofollow");
+    res.setHeader("cache-control", "no-store");
   }
 
   next();
@@ -508,6 +589,80 @@ function safeTokenEquals(received, expected) {
   return crypto.timingSafeEqual(receivedDigest, expectedDigest);
 }
 
+function signCookiePayload(payload, secret) {
+  const signature = crypto.createHmac("sha256", secret).update(payload, "utf8").digest("base64url");
+  return `${payload}.${signature}`;
+}
+
+function verifySignedCookie(value, secret) {
+  if (typeof value !== "string" || !value || !secret) {
+    return "";
+  }
+
+  const separator = value.lastIndexOf(".");
+  if (separator <= 0) {
+    return "";
+  }
+
+  const payload = value.slice(0, separator);
+  const signature = value.slice(separator + 1);
+  const expectedSignature = crypto.createHmac("sha256", secret).update(payload, "utf8").digest("base64url");
+  return safeTokenEquals(signature, expectedSignature) ? payload : "";
+}
+
+function parseCookies(header) {
+  if (typeof header !== "string" || !header) {
+    return {};
+  }
+
+  const cookies = {};
+  for (const part of header.split(";")) {
+    const separator = part.indexOf("=");
+    if (separator <= 0) {
+      continue;
+    }
+
+    const name = part.slice(0, separator).trim();
+    const rawValue = part.slice(separator + 1).trim();
+    try {
+      cookies[name] = decodeURIComponent(rawValue);
+    } catch (_error) {
+      cookies[name] = "";
+    }
+  }
+  return cookies;
+}
+
+function setCookie(res, name, value, options = {}) {
+  const parts = [`${name}=${encodeURIComponent(value)}`];
+  if (options.maxAge) {
+    parts.push(`Max-Age=${Math.floor(options.maxAge)}`);
+  }
+  parts.push(`Path=${options.path || "/"}`);
+  if (options.httpOnly) {
+    parts.push("HttpOnly");
+  }
+  if (options.secure) {
+    parts.push("Secure");
+  }
+  if (options.sameSite) {
+    parts.push(`SameSite=${options.sameSite}`);
+  }
+  parts.push("Priority=High");
+  res.append("set-cookie", parts.join("; "));
+}
+
+function clearCookie(res, name, options = {}) {
+  setCookie(res, name, "", {
+    ...options,
+    maxAge: -1
+  });
+}
+
+function shouldUseSecureCookies(req) {
+  return nodeEnv === "production" || req.secure;
+}
+
 function parseList(value) {
   if (!value) {
     return [];
@@ -532,6 +687,55 @@ function parseNonNegativeInteger(value, fallback) {
   return fallback;
 }
 
+function parsePositiveInteger(value, fallback) {
+  const parsed = Number(value);
+  if (Number.isInteger(parsed) && parsed > 0) {
+    return parsed;
+  }
+
+  return fallback;
+}
+
+function validateProductionConfig(env = process.env) {
+  if (String(env.NODE_ENV || "").trim().toLowerCase() !== "production") {
+    return;
+  }
+
+  const errors = [];
+  const configuredAdminToken = String(env.ADMIN_TOKEN || "").trim();
+  const configuredSurveySecret = String(env.SURVEY_COOKIE_SECRET || "").trim();
+  const configuredDatabaseUrl = String(env.DATABASE_URL || "").trim();
+  const configuredHosts = parseList(env.ALLOWED_HOSTS).map((host) => host.toLowerCase());
+  const configuredListenHost = String(env.HOST || "").trim();
+  const configuredTrustProxy = String(env.TRUST_PROXY || "").trim();
+
+  if (configuredAdminToken.length < 32 || configuredAdminToken === "change-this-to-a-long-random-token") {
+    errors.push("ADMIN_TOKEN musi byt nahodny a mit alespon 32 znaku.");
+  }
+  if (configuredSurveySecret.length < 32 || configuredSurveySecret === "change-this-to-another-long-random-secret") {
+    errors.push("SURVEY_COOKIE_SECRET musi byt nahodny a mit alespon 32 znaku.");
+  }
+  if (configuredAdminToken && configuredSurveySecret && configuredAdminToken === configuredSurveySecret) {
+    errors.push("SURVEY_COOKIE_SECRET musi byt odlisny od ADMIN_TOKEN.");
+  }
+  if (!configuredDatabaseUrl || /(?:change-me|user:password)@/i.test(configuredDatabaseUrl)) {
+    errors.push("DATABASE_URL musi obsahovat realne produkcni udaje.");
+  }
+  if (configuredHosts.length === 0 || configuredHosts.some((host) => host === "*" || host === "example.com" || host === "www.example.com")) {
+    errors.push("ALLOWED_HOSTS musi obsahovat realne produkcni domeny bez wildcard.");
+  }
+  if (!configuredListenHost) {
+    errors.push("HOST musi byt v produkci nastaven explicitne.");
+  }
+  if (!configuredTrustProxy || ["0", "false", "no", "off"].includes(configuredTrustProxy.toLowerCase())) {
+    errors.push("TRUST_PROXY musi byt v produkci nastaven pro duveryhodnou reverzni proxy.");
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Neplatna produkcni konfigurace:\n- ${errors.join("\n- ")}`);
+  }
+}
+
 app.use((error, _req, res, _next) => {
   if (error.type === "entity.too.large") {
     res.status(413).json({ error: "Pozadavek je prilis velky." });
@@ -548,7 +752,9 @@ app.use((error, _req, res, _next) => {
 });
 
 if (require.main === module) {
-  ensureSchema()
+  Promise.resolve()
+    .then(() => validateProductionConfig())
+    .then(() => ensureSchema())
     .then(() => {
       const server = listenHost
         ? app.listen(port, listenHost, () => {
@@ -570,12 +776,13 @@ if (require.main === module) {
       process.once("SIGINT", shutdown);
     })
     .catch((error) => {
-      console.error("Nepodarilo se pripravit databazi.", error);
+      console.error("Nepodarilo se spustit aplikaci.", error);
       process.exit(1);
     });
 }
 
 module.exports = {
   app,
-  ensureSchema
+  ensureSchema,
+  validateProductionConfig
 };

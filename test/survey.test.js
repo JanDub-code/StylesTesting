@@ -61,3 +61,9 @@ test("csvEscape escapes quotes, commas and line breaks", () => {
   assert.equal(csvEscape('Ahoj, "test"'), '"Ahoj, ""test"""');
   assert.equal(csvEscape("radek\nnovy"), '"radek\nnovy"');
 });
+
+test("csvEscape neutralizes spreadsheet formulas", () => {
+  assert.equal(csvEscape("=1+1"), "'=1+1");
+  assert.equal(csvEscape("  +SUM(1,2)"), '"\'  +SUM(1,2)"');
+  assert.equal(csvEscape("\t@SUM(1,2)"), '"\'\t@SUM(1,2)"');
+});

@@ -12,7 +12,7 @@
         <div>
           <p class="eyebrow">Admin</p>
           <h1 id="adminTitle">Výsledky ankety designů</h1>
-          <p class="lead">Souhrn je chráněný admin tokenem. Veřejná anketa globální výsledky nezobrazuje.</p>
+          <p class="lead">Souhrn je chráněný admin relací. Veřejná anketa globální výsledky nezobrazuje.</p>
         </div>
         <a class="secondary-button" href="/">Zpět na anketu</a>
       </section>
@@ -20,10 +20,11 @@
       <form class="admin-token-panel" id="tokenForm">
         <label>
           <span>Admin token</span>
-          <input id="adminToken" type="password" autocomplete="current-password" placeholder="ADMIN_TOKEN" required />
+          <input id="adminToken" type="password" autocomplete="current-password" placeholder="ADMIN_TOKEN" />
         </label>
-        <button class="primary-button" type="submit">Načíst výsledky</button>
+        <button class="primary-button" type="submit">Přihlásit a načíst</button>
         <button class="secondary-button" id="exportCsv" type="button" disabled>Stáhnout CSV</button>
+        <button class="secondary-button" id="logoutButton" type="button" hidden>Odhlásit</button>
       </form>
 
       <section class="results-grid" id="results" hidden>
