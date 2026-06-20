@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kimi Agent Dashboard — Iterace 06</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar" aria-label="Hlavní modulová navigace">
+        <div class="brand">
+          <div class="brand__mark" aria-hidden="true">ER</div>
+          <div>
+            <strong>Evidence revizí</strong>
+            <span>Modulární provoz</span>
+          </div>
+        </div>
+
+        <section class="today-card" aria-label="Dnes je potřeba">
+          <span>Dnes je potřeba</span>
+          <div class="today-card__row">
+            <strong>2</strong>
+            <em>Řešit</em>
+          </div>
+          <p>revize po termínu</p>
+        </section>
+
+        <nav class="nav-list" aria-label="Vybrané moduly">
+          <button class="nav-item is-active" type="button" data-nav="Pracovní plocha">
+            <span aria-hidden="true">▦</span>
+            <b>Pracovní plocha</b>
+          </button>
+          <button class="nav-item" type="button" data-nav="Revize & zařízení">
+            <span aria-hidden="true">☑</span>
+            <b>Revize & zařízení</b>
+            <i>2</i>
+          </button>
+          <button class="nav-item" type="button" data-nav="Školení">
+            <span aria-hidden="true">◇</span>
+            <b>Školení</b>
+          </button>
+          <button class="nav-item" type="button" data-nav="Lidé & smlouvy">
+            <span aria-hidden="true">◉</span>
+            <b>Lidé & smlouvy</b>
+            <i>3</i>
+          </button>
+          <button class="nav-item" type="button" data-nav="Finance">
+            <span aria-hidden="true">₭</span>
+            <b>Finance</b>
+          </button>
+          <button class="nav-item" type="button" data-nav="Reporting">
+            <span aria-hidden="true">▧</span>
+            <b>Reporting</b>
+          </button>
+        </nav>
+
+        <div class="sidebar__utilities" aria-label="Sekundární navigace">
+          <button class="nav-item nav-item--utility" type="button" data-toast="Katalog modulů je v této iteraci součástí hlavní plochy.">
+            <span aria-hidden="true">▦</span>
+            <b>Všechny moduly</b>
+          </button>
+          <button class="nav-item nav-item--utility" type="button" data-toast="Globální nastavení není v prototypu napojené.">
+            <span aria-hidden="true">⚙</span>
+            <b>Nastavení</b>
+          </button>
+
+          <div class="user-card">
+            <div class="user-card__avatar" aria-hidden="true">MJ</div>
+            <div>
+              <strong>Miroslav Jaros</strong>
+              <span>Administrátor</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <button class="mobile-scrim" id="mobileScrim" type="button" aria-label="Zavřít navigaci"></button>
+
+      <main class="workspace">
+        <div class="workspace__inner">
+          <header class="topbar">
+            <div class="topbar__title">
+              <button class="mobile-menu" id="mobileMenu" type="button" aria-label="Otevřít navigaci">☰</button>
+              <div>
+                <div class="tenant-line">
+                  <span class="online-dot" aria-hidden="true"></span>
+                  <span>Provoz online</span>
+                  <em>CSELMONT s.r.o.</em>
+                </div>
+                <h1 id="screenTitle">Pracovní plocha</h1>
+              </div>
+            </div>
+
+            <label class="search-box" aria-label="Globální hledání">
+              <span aria-hidden="true">⌕</span>
+              <input id="moduleSearch" type="search" placeholder="Hledat revizi, osobu, smlouvu nebo dokument" autocomplete="off" />
+            </label>
+
+            <div class="topbar__actions">
+              <button class="notification-button" type="button" data-toast="Máte 3 upozornění: 2 revize po termínu a 1 podpis." aria-label="Notifikace">
+                ◌<sup>3</sup>
+              </button>
+              <button class="secondary-action" id="editModules" type="button">Upravit moduly</button>
+              <button class="primary-action" type="button" data-toast="Koncept nové revize byl připraven.">+ Nová revize</button>
+            </div>
+          </header>
+
+          <section class="hero-grid" aria-label="Souhrn pracovní plochy">
+            <article class="hero-card">
+              <div class="hero-card__copy">
+                <span class="eyebrow">Co dnes řešit</span>
+                <h2>Revize, školení, smlouvy a dokumenty v jedné auditní stopě.</h2>
+                <p>
+                  Evidence revizí ukazuje, co hoří dnes, které moduly firma používá
+                  a kam má technik nebo administrátor kliknout jako první.
+                </p>
+
+                <div class="stats-grid" aria-label="Hlavní metriky">
+                  <div class="stat-card">
+                    <span aria-hidden="true">☑</span>
+                    <strong>12</strong>
+                    <small>aktivních revizí</small>
+                  </div>
+                  <div class="stat-card stat-card--danger">
+                    <span aria-hidden="true">⚠</span>
+                    <strong>2</strong>
+                    <small>po termínu</small>
+                    <em>Akce</em>
+                  </div>
+                  <div class="stat-card">
+                    <span aria-hidden="true">✒</span>
+                    <strong>3</strong>
+                    <small>čekají na podpis</small>
+                  </div>
+                  <div class="stat-card">
+                    <span aria-hidden="true">▣</span>
+                    <strong>10 let</strong>
+                    <small>retence dokumentů</small>
+                  </div>
+                </div>
+              </div>
+
+              <div class="photo-mosaic" aria-label="Oblasti provozu">
+                <figure class="photo-tile photo-tile--large">
+                  <img src="https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=900&q=80" alt="Technik pracuje u elektrického rozvaděče" />
+                  <figcaption>Terén</figcaption>
+                </figure>
+                <figure class="photo-tile">
+                  <img src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=900&q=80" alt="Dokumenty a pracovní protokoly na stole" />
+                  <figcaption>Dokumenty</figcaption>
+                </figure>
+                <figure class="photo-tile">
+                  <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=900&q=80" alt="Tým plánuje práci a školení" />
+                  <figcaption>Tým</figcaption>
+                </figure>
+              </div>
+            </article>
+
+            <aside class="priority-card" aria-label="Priorita dne">
+              <div class="section-heading section-heading--tight">
+                <div>
+                  <strong>Priorita dne</strong>
+                  <span>Jeden jasný seznam, ne chaos.</span>
+                </div>
+                <em>3 úkoly</em>
+              </div>
+
+              <div class="priority-list">
+                <button class="priority-item priority-item--danger" type="button" data-priority="revize">
+                  <span aria-hidden="true">⚠</span>
+                  <b>2 revize po termínu</b>
+                  <small>EPS Lites a hlavní rozvodna čekají na uzavření.</small>
+                  <i aria-hidden="true">→</i>
+                </button>
+                <button class="priority-item priority-item--warning" type="button" data-priority="smlouvy-clm">
+                  <span aria-hidden="true">✒</span>
+                  <b>3 smlouvy expirují</b>
+                  <small>DPP a dodatky vyžadují kontrolu do 14 dnů.</small>
+                  <i aria-hidden="true">→</i>
+                </button>
+                <button class="priority-item priority-item--info" type="button" data-priority="skoleni-elektro">
+                  <span aria-hidden="true">◇</span>
+                  <b>1 školení vyprší</b>
+                  <small>Elektro NV 194/2022, automatické upozornění připravené.</small>
+                  <i aria-hidden="true">→</i>
+                </button>
+              </div>
+
+              <div class="active-summary">
+                <span aria-hidden="true">✓</span>
+                <div>
+                  <strong><b id="activeModuleCount">0</b> aktivních modulů</strong>
+                  <p>Levý panel ukazuje jen vybranou pracovní množinu. <b id="availableModuleCount">0</b> moduly čekají bokem.</p>
+                </div>
+              </div>
+            </aside>
+          </section>
+
+          <section class="module-header" aria-label="Ovládání modulového workspace">
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">Modulový workspace</span>
+                <h2>Vybrané oblasti práce</h2>
+              </div>
+              <p>
+                Aktivní moduly jsou každodenní pracovní vstupy. Dostupné a zamčené moduly
+                jsou vidět tady, ne jako hluk v levém panelu.
+              </p>
+            </div>
+
+            <div class="workspace-controls">
+              <div class="filter-group" aria-label="Filtr modulů">
+                <button class="filter-chip is-active" type="button" data-filter="all">Vše</button>
+                <button class="filter-chip" type="button" data-filter="active">Zapnuté</button>
+                <button class="filter-chip" type="button" data-filter="available">K zapnutí</button>
+                <button class="filter-chip" type="button" data-filter="locked">Plán Pro</button>
+              </div>
+              <button class="ghost-action" id="densityToggle" type="button">Kompaktní režim</button>
+            </div>
+          </section>
+
+          <div class="module-sections" id="moduleSections" aria-live="polite"></div>
+
+          <div class="empty-state" id="emptyState" hidden>
+            <strong>Nic nenalezeno</strong>
+            <span>Zkuste zrušit filtr nebo upravit hledaný výraz.</span>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <aside class="settings-drawer" id="settingsDrawer" aria-label="Nastavení modulu" aria-hidden="true">
+      <header class="settings-drawer__header">
+        <div class="drawer-title">
+          <div class="drawer-title__icon" id="drawerIcon" aria-hidden="true">☑</div>
+          <div>
+            <span id="drawerStatus">Nastavení modulu</span>
+            <h2 id="drawerTitle">Revize & zařízení</h2>
+          </div>
+        </div>
+        <button class="drawer-close" id="drawerClose" type="button" aria-label="Zavřít nastavení">×</button>
+      </header>
+
+      <div class="settings-drawer__body">
+        <figure class="drawer-photo">
+          <img id="drawerPhoto" src="" alt="" />
+          <figcaption id="drawerSubtitle">Revize, závady, zařízení a protokoly</figcaption>
+        </figure>
+        <p class="drawer-description" id="drawerDescription"></p>
+
+        <section class="settings-block">
+          <h3>◌ Zobrazení</h3>
+          <label class="switch-row">
+            <span><b>Zobrazit na pracovní ploše</b><small>Karta modulu bude viditelná na hlavní obrazovce.</small></span>
+            <input type="checkbox" checked />
+          </label>
+          <label class="switch-row">
+            <span><b>Zobrazit metriky</b><small>Ukázat stav, počty a upozornění přímo na dlaždici.</small></span>
+            <input type="checkbox" checked />
+          </label>
+          <label class="switch-row">
+            <span><b>Zařadit do levého panelu</b><small>Jen pokud patří mezi hlavní vybranou množinu modulů.</small></span>
+            <input type="checkbox" />
+          </label>
+        </section>
+
+        <section class="settings-block">
+          <h3>◌ Notifikace</h3>
+          <label class="switch-row">
+            <span><b>Povolit upozornění</b><small>E-mailové upozornění na důležité události.</small></span>
+            <input type="checkbox" checked />
+          </label>
+          <label class="switch-row">
+            <span><b>Lhůty a termíny</b><small>Upozornit před vypršením lhůty.</small></span>
+            <input type="checkbox" checked />
+          </label>
+          <label class="switch-row">
+            <span><b>Denní souhrn</b><small>Krátký přehled každé ráno.</small></span>
+            <input type="checkbox" />
+          </label>
+        </section>
+
+        <section class="settings-block">
+          <h3>◌ Oprávnění</h3>
+          <label class="select-row">
+            <span>Přístup pro roli</span>
+            <select>
+              <option>Všechny role</option>
+              <option>Administrátor</option>
+              <option>Technik</option>
+              <option>Pouze prohlížení</option>
+            </select>
+          </label>
+          <label class="select-row">
+            <span>Úroveň úprav</span>
+            <select>
+              <option>Plná práva</option>
+              <option>Úpravy bez mazání</option>
+              <option>Pouze vytváření</option>
+              <option>Pouze čtení</option>
+            </select>
+          </label>
+        </section>
+      </div>
+
+      <footer class="settings-drawer__footer">
+        <button class="secondary-action" id="drawerCancel" type="button">Zrušit</button>
+        <button class="primary-action" id="drawerSave" type="button">Uložit</button>
+      </footer>
+    </aside>
+
+    <nav class="mobile-dock" aria-label="Mobilní navigace">
+      <button class="is-active" type="button" data-mobile-nav="Pracovní plocha">Plocha</button>
+      <button type="button" data-mobile-nav="Revize & zařízení">Revize <b>2</b></button>
+      <button type="button" data-mobile-nav="Moduly">Moduly</button>
+    </nav>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">Akce hotová.</div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

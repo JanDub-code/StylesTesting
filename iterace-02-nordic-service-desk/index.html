@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Nordic Service Desk — Iterace 02</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body data-density="comfortable">
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Hlavní navigace">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">NS</div>
+          <div>
+            <p class="eyebrow">revizní servis</p>
+            <h1>Nordic Desk</h1>
+          </div>
+        </div>
+
+        <nav class="side-nav" aria-label="Pracovní oblasti">
+          <a class="nav-item is-active" href="#overview"><span>⌂</span>Přehled</a>
+          <a class="nav-item" href="#queue"><span>☼</span>Dnes</a>
+          <a class="nav-item" href="#queue"><span>✓</span>Revize</a>
+          <a class="nav-item" href="#clients"><span>◌</span>Zákazníci</a>
+          <a class="nav-item" href="#people"><span>☺</span>Lidé</a>
+          <a class="nav-item" href="#documents"><span>□</span>Dokumenty</a>
+          <a class="nav-item" href="#finance"><span>◍</span>Finance</a>
+          <a class="nav-item" href="#settings"><span>⚙</span>Nastavení</a>
+        </nav>
+
+        <div class="sidebar-card">
+          <div class="tiny-icon" aria-hidden="true">↗</div>
+          <p class="sidebar-card__title">Klidný provoz</p>
+          <p>92 % revizí je v termínu. Tři položky čekají na pozornost.</p>
+        </div>
+      </aside>
+
+      <main class="main-content" id="overview">
+        <header class="topbar" aria-label="Horní lišta">
+          <div class="tenant-pill">
+            <span class="tenant-dot" aria-hidden="true"></span>
+            <div>
+              <p class="eyebrow">tenant</p>
+              <strong>Mont servis s.r.o.</strong>
+            </div>
+          </div>
+
+          <label class="search-field">
+            <span aria-hidden="true">⌕</span>
+            <input type="search" placeholder="Hledat zákazníka, revizi nebo protokol" aria-label="Hledat zákazníka, revizi nebo protokol" />
+          </label>
+
+          <div class="top-actions">
+            <div class="density-toggle" id="settings" aria-label="Hustota zobrazení">
+              <button class="density-button is-active" type="button" data-density="comfortable" aria-pressed="true">Komfortní</button>
+              <button class="density-button" type="button" data-density="compact" aria-pressed="false">Kompaktní</button>
+            </div>
+            <button class="icon-button" type="button" aria-label="Notifikace">◔</button>
+            <button class="primary-pill" type="button" data-action="plan">+ Nová revize</button>
+          </div>
+        </header>
+
+        <section class="mobile-day-card soft-card" id="today" aria-labelledby="mobile-day-title">
+          <p class="eyebrow">dnes</p>
+          <h2 id="mobile-day-title">Zjednodušená fronta</h2>
+          <p><strong id="mobileRemainingCount">4</strong> úkoly zbývají, nejbližší revize začíná v 9:30.</p>
+          <button class="secondary-pill" type="button" data-jump-today>Otevřít dnešní plán</button>
+        </section>
+
+        <section class="hero-card soft-card" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow">servisní přehled</p>
+            <h2 id="hero-title">Dobré ráno, co dnes vyřídit?</h2>
+            <p>
+              Dnešní provoz je klidný. Prioritou je dopolední elektro revize,
+              doplnění podkladů a tři drobná compliance upozornění.
+            </p>
+            <div class="hero-actions" aria-label="Rychlé akce">
+              <button class="primary-pill" type="button" data-action="plan">Naplánovat revizi</button>
+              <button class="secondary-pill" type="button" data-jump-today>Otevřít dnešní plán</button>
+              <button class="secondary-pill" type="button" data-open-risks>Vyřešit upozornění</button>
+            </div>
+          </div>
+          <div class="summary-stack" aria-label="Souhrn dne">
+            <div class="summary-chip">
+              <span class="summary-value" id="remainingCount">4</span>
+              <span>čeká ve frontě</span>
+            </div>
+            <div class="summary-chip mint">
+              <span class="summary-value">92 %</span>
+              <span>compliance OK</span>
+            </div>
+            <div class="summary-chip sand">
+              <span class="summary-value">3</span>
+              <span>jemná rizika</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="work-tabs-card soft-card" id="queue" aria-labelledby="queue-title">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">servisní fronta</p>
+              <h2 id="queue-title">Dnešní práce</h2>
+            </div>
+            <div class="view-toggle" role="tablist" aria-label="Přepnout pohled">
+              <button class="view-button is-active" type="button" role="tab" aria-selected="true" data-view="today">Dnes</button>
+              <button class="view-button" type="button" role="tab" aria-selected="false" data-view="week">Týden</button>
+              <button class="view-button" type="button" role="tab" aria-selected="false" data-view="risks">Rizika</button>
+            </div>
+          </div>
+
+          <div class="view-panel is-active" data-panel="today" role="tabpanel">
+            <div class="queue-intro">
+              <span class="soft-badge">Dnes 8:00–16:30</span>
+              <span>Otevři úkol pro měkký detailní panel nebo ho rovnou označ jako hotový.</span>
+            </div>
+            <div class="task-list" id="taskList" aria-live="polite"></div>
+          </div>
+
+          <div class="view-panel" data-panel="week" role="tabpanel" hidden>
+            <div class="week-grid">
+              <article class="week-card">
+                <span>Pondělí</span>
+                <strong>9 revizí</strong>
+                <p>Největší blok: administrativní centrum Sever.</p>
+              </article>
+              <article class="week-card">
+                <span>Středa</span>
+                <strong>4 protokoly</strong>
+                <p>Čekají na finální kontrolu a podpis.</p>
+              </article>
+              <article class="week-card">
+                <span>Pátek</span>
+                <strong>2 rizika</strong>
+                <p>Expirace oprávnění a opožděná fakturace.</p>
+              </article>
+            </div>
+          </div>
+
+          <div class="view-panel" data-panel="risks" role="tabpanel" hidden>
+            <div class="queue-intro risk-intro">
+              <span class="soft-badge warning">Priorita</span>
+              <span>Pastelová paleta ponechává rizika čitelná bez agresivního velínu.</span>
+            </div>
+            <div class="task-list" id="riskList" aria-live="polite"></div>
+          </div>
+        </section>
+
+        <section class="dashboard-grid" aria-label="Doplňkové přehledy">
+          <article class="health-card soft-card">
+            <div class="section-heading compact-heading">
+              <div>
+                <p class="eyebrow">compliance health</p>
+                <h2>92 % v pořádku</h2>
+              </div>
+              <span class="soft-badge mint">stabilní</span>
+            </div>
+            <div class="health-layout">
+              <div class="progress-ring" style="--progress: 92%" aria-label="92 procent v pořádku">
+                <span>92%</span>
+              </div>
+              <div class="health-notes">
+                <p><strong>3 věci čekají</strong> na jemné dořešení.</p>
+                <ul>
+                  <li>1 protokol bez podpisu</li>
+                  <li>1 zákazník čeká na termín</li>
+                  <li>1 oprávnění expiruje za 14 dní</li>
+                </ul>
+              </div>
+            </div>
+          </article>
+
+          <article class="clients-card soft-card" id="clients">
+            <div class="section-heading compact-heading">
+              <div>
+                <p class="eyebrow">klienti a lokace</p>
+                <h2>Nejaktivnější zákazníci</h2>
+              </div>
+            </div>
+            <div class="abstract-map" aria-hidden="true">
+              <span class="map-pin pin-a"></span>
+              <span class="map-pin pin-b"></span>
+              <span class="map-pin pin-c"></span>
+            </div>
+            <div class="client-list">
+              <div><strong>Nordic Mall</strong><span>5 aktivních revizí</span></div>
+              <div><strong>Vinohradská 18</strong><span>2 podklady chybí</span></div>
+              <div><strong>Sklad Jih</strong><span>1 plánovaná návštěva</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="modules-card soft-card" aria-labelledby="modules-title">
+          <div class="section-heading compact-heading">
+            <div>
+              <p class="eyebrow">pracovní oblasti</p>
+              <h2 id="modules-title">Moduly pro dnešní provoz</h2>
+            </div>
+          </div>
+          <div class="module-rail">
+            <article class="module-card blue" tabindex="0">
+              <span class="module-icon">✓</span>
+              <strong>Revize</strong>
+              <p>Plány, termíny a výjezdy.</p>
+            </article>
+            <article class="module-card mint" tabindex="0">
+              <span class="module-icon">◌</span>
+              <strong>Zákazníci</strong>
+              <p>Lokace, kontakty, historie.</p>
+            </article>
+            <article class="module-card sand" id="documents" tabindex="0">
+              <span class="module-icon">□</span>
+              <strong>Dokumenty</strong>
+              <p>Protokoly a podpisy.</p>
+            </article>
+            <article class="module-card lilac" id="people" tabindex="0">
+              <span class="module-icon">☺</span>
+              <strong>Lidé</strong>
+              <p>Technici a oprávnění.</p>
+            </article>
+            <article class="module-card rose" id="finance" tabindex="0">
+              <span class="module-icon">◍</span>
+              <strong>Finance</strong>
+              <p>Fakturace bez stresu.</p>
+            </article>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="panel-overlay" data-close-panel hidden></div>
+    <aside class="detail-panel" id="detailPanel" aria-labelledby="panelTitle" aria-hidden="true" hidden>
+      <div class="panel-scroll">
+        <button class="panel-close" type="button" data-close-panel aria-label="Zavřít detail">×</button>
+        <div class="panel-avatar" id="panelAvatar" aria-hidden="true">NM</div>
+        <p class="eyebrow">detail úkolu</p>
+        <h2 id="panelTitle">Revize elektro</h2>
+        <p class="panel-subtitle" id="panelSubtitle">Nordic Mall · dnes 9:30</p>
+
+        <div class="panel-info-grid">
+          <div>
+            <span>Stav</span>
+            <strong id="panelStatus">Čeká</strong>
+          </div>
+          <div>
+            <span>Typ</span>
+            <strong id="panelType">Elektro</strong>
+          </div>
+          <div>
+            <span>Technik</span>
+            <strong id="panelOwner">Tereza</strong>
+          </div>
+          <div>
+            <span>Priorita</span>
+            <strong id="panelPriority">Běžná</strong>
+          </div>
+        </div>
+
+        <section class="panel-note">
+          <h3>Co zkontrolovat</h3>
+          <p id="panelNote">Zkontrolovat dokumentaci, připravit protokol a potvrdit příjezd technika.</p>
+        </section>
+      </div>
+      <footer class="panel-footer">
+        <button class="secondary-pill" type="button" data-close-panel>Zpět do fronty</button>
+        <button class="primary-pill" type="button" id="panelDoneButton">Označit jako hotové</button>
+      </footer>
+    </aside>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <nav class="bottom-nav" aria-label="Mobilní navigace">
+      <a class="is-active" href="#overview"><span>⌂</span>Přehled</a>
+      <a href="#today"><span>☼</span>Dnes</a>
+      <a href="#queue"><span>✓</span>Revize</a>
+      <a href="#clients"><span>◌</span>Klienti</a>
+    </nav>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

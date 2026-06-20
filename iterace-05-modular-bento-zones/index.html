@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Iterace 05 — Modular Bento Zones</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body data-active-zone="revize" data-density="comfortable">
+    <a class="skip-link" href="#workspace">Přeskočit na pracovní plochu</a>
+
+    <div class="ambient ambient-one" aria-hidden="true"></div>
+    <div class="ambient ambient-two" aria-hidden="true"></div>
+
+    <div class="app-shell">
+      <header class="command-bar" aria-label="Top command bar">
+        <div class="command-left">
+          <button
+            class="launcher-pill"
+            type="button"
+            data-open-launcher
+            aria-controls="moduleLauncher"
+            aria-expanded="false"
+          >
+            <span class="launcher-glyph" aria-hidden="true">▦</span>
+            <span>Všechny moduly</span>
+          </button>
+
+          <div class="brand-mark" aria-label="Modular OS">
+            <span class="brand-orb">MB</span>
+            <span>
+              <strong>Modular OS</strong>
+              <small>Evidence revizí</small>
+            </span>
+          </div>
+        </div>
+
+        <label class="command-search">
+          <span class="command-hint">⌘K</span>
+          <input
+            type="search"
+            aria-label="Globální vyhledávání"
+            placeholder="Hledat revize, osoby, smlouvy nebo reporty…"
+          />
+        </label>
+
+        <div class="command-actions" aria-label="Rychlé akce">
+          <span class="tenant-pill">Elektro Montáže Praha</span>
+          <button class="ghost-button" type="button" id="densityToggle" aria-pressed="false">
+            Kompaktní mřížka
+          </button>
+          <button class="ghost-button" type="button" id="editLayout" aria-pressed="false">
+            Upravit plochu
+          </button>
+          <button class="quick-action" type="button" id="quickAction" aria-label="Nová rychlá akce">+</button>
+        </div>
+      </header>
+
+      <nav class="area-switcher" aria-label="Floating area switcher">
+        <button class="area-button is-active" type="button" data-zone="revize" aria-current="page">
+          <span class="area-icon">⚡</span>
+          <span class="area-label">Revize</span>
+        </button>
+        <button class="area-button" type="button" data-zone="lide">
+          <span class="area-icon">◌</span>
+          <span class="area-label">Lidé</span>
+        </button>
+        <button class="area-button" type="button" data-zone="dokumenty">
+          <span class="area-icon">▤</span>
+          <span class="area-label">Dokumenty</span>
+        </button>
+        <button class="area-button" type="button" data-zone="finance">
+          <span class="area-icon">₿</span>
+          <span class="area-label">Finance</span>
+        </button>
+        <button class="area-button" type="button" data-zone="reporting">
+          <span class="area-icon">◎</span>
+          <span class="area-label">Reporting</span>
+        </button>
+
+        <div class="area-detail" id="areaDetail" aria-live="polite">
+          <small>Aktivní zóna</small>
+          <strong id="areaDetailTitle">Revize & zařízení</strong>
+          <span id="areaDetailMeta">27 otevřených věcí</span>
+        </div>
+      </nav>
+
+      <main class="workspace" id="workspace">
+        <section class="workspace-top" aria-labelledby="workspaceTitle">
+          <div>
+            <p class="eyebrow">
+              <span class="active-dot" aria-hidden="true"></span>
+              <span id="activeZonePill">Zóna Revize & zařízení</span>
+            </p>
+            <h1 id="workspaceTitle">Modulární bento pracovní plocha</h1>
+            <p>
+              Barevné zóny nahrazují klasický sidebar. Plocha se chová jako firemní cockpit:
+              rychlé akce nahoře, zóny vlevo a moduly v launcheru.
+            </p>
+          </div>
+
+          <div class="workspace-kpis" aria-label="Souhrn dne">
+            <div>
+              <strong>94 %</strong>
+              <span>compliance skóre</span>
+            </div>
+            <div>
+              <strong>18</strong>
+              <span>dokončeno dnes</span>
+            </div>
+            <div>
+              <strong>7</strong>
+              <span>urgentní položky</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="edit-banner" id="editBanner" hidden>
+          <strong>Režim úprav plochy</strong>
+          <span>Karty jsou fake přeskládané a zvýrazněné, bez ukládání nastavení.</span>
+        </div>
+
+        <section class="bento-grid" id="bentoGrid" aria-label="Bento pracovní plocha">
+          <article class="bento-card hero-card zone-revize is-zone-active" data-card="hero" data-zone="revize">
+            <div class="card-topline">
+              <span class="zone-chip">Revize</span>
+              <span>Dnes do 16:00</span>
+            </div>
+            <div class="hero-copy">
+              <h2>Co dnes řešit</h2>
+              <p>Urgentní revize, prošlé lhůty a čekající podpisy na jednom místě.</p>
+            </div>
+            <div class="hero-metric">
+              <strong>7</strong>
+              <span>prioritních položek</span>
+            </div>
+            <button class="primary-cta" type="button" data-zone="revize" data-focus-zone>
+              Otevřít revizní queue
+            </button>
+          </article>
+
+          <article class="bento-card timeline-card zone-reporting" data-card="timeline" data-zone="reporting">
+            <div class="card-heading-row">
+              <div>
+                <span class="mini-label">Dnes</span>
+                <h2>Mini timeline</h2>
+              </div>
+              <span class="soft-pill">12. června</span>
+            </div>
+            <ol class="timeline-list">
+              <li>
+                <time>08:30</time>
+                <span>Kontrola rozvaděčů — hala B</span>
+              </li>
+              <li>
+                <time>10:00</time>
+                <span>Školení elektro tým servis</span>
+              </li>
+              <li>
+                <time>13:15</time>
+                <span>Podpis smlouvy: externí revizák</span>
+              </li>
+              <li>
+                <time>15:45</time>
+                <span>Export compliance reportu</span>
+              </li>
+            </ol>
+          </article>
+
+          <article class="bento-card zones-card zone-revize is-zone-active" data-card="zones" data-zone="revize">
+            <div class="card-heading-row">
+              <div>
+                <span class="mini-label">Barevné zóny</span>
+                <h2>Module zones</h2>
+              </div>
+              <button
+                class="text-button"
+                type="button"
+                data-open-launcher
+                aria-controls="moduleLauncher"
+                aria-expanded="false"
+              >
+                Všechny moduly
+              </button>
+            </div>
+
+            <div class="zone-tile-grid" aria-label="Přepínač zón">
+              <button class="zone-tile zone-revize is-active" type="button" data-zone="revize">
+                <span>⚡</span>
+                <strong>Revize & zařízení</strong>
+                <small>27 věcí · 3 urgentní</small>
+              </button>
+              <button class="zone-tile zone-skoleni" type="button" data-zone="skoleni">
+                <span>◒</span>
+                <strong>Školení elektro</strong>
+                <small>12 lidí · 4 expirace</small>
+              </button>
+              <button class="zone-tile zone-bozp" type="button" data-zone="bozp">
+                <span>▲</span>
+                <strong>BOZP</strong>
+                <small>5 incidentů · 1 nové</small>
+              </button>
+              <button class="zone-tile zone-lide" type="button" data-zone="lide">
+                <span>◌</span>
+                <strong>Lidé & smlouvy</strong>
+                <small>8 podpisů · 2 nástupy</small>
+              </button>
+              <button class="zone-tile zone-compliance" type="button" data-zone="dokumenty">
+                <span>▤</span>
+                <strong>GDPR & dokumenty</strong>
+                <small>94 % skóre · 6 změn</small>
+              </button>
+              <button class="zone-tile zone-reporting" type="button" data-zone="reporting">
+                <span>◎</span>
+                <strong>Reporting</strong>
+                <small>3 reporty · 1 čeká</small>
+              </button>
+            </div>
+          </article>
+
+          <article class="bento-card queue-card zone-skoleni" data-card="queue" data-zone="skoleni">
+            <div class="card-heading-row">
+              <div>
+                <span class="mini-label">Čeká na mě</span>
+                <h2>Work queue</h2>
+              </div>
+              <span class="queue-count">9</span>
+            </div>
+            <ul class="queue-list">
+              <li>
+                <span class="queue-priority danger"></span>
+                <div>
+                  <strong>Revize skladu chemie</strong>
+                  <small>termín prošel před 2 dny</small>
+                </div>
+              </li>
+              <li>
+                <span class="queue-priority teal"></span>
+                <div>
+                  <strong>Potvrdit školení Lukáš K.</strong>
+                  <small>certifikát čeká na kontrolu</small>
+                </div>
+              </li>
+              <li>
+                <span class="queue-priority violet"></span>
+                <div>
+                  <strong>Smlouva externího technika</strong>
+                  <small>připraveno k podpisu</small>
+                </div>
+              </li>
+              <li>
+                <span class="queue-priority amber"></span>
+                <div>
+                  <strong>Fakturace revizí Q2</strong>
+                  <small>chybí kontrola nákladů</small>
+                </div>
+              </li>
+            </ul>
+          </article>
+
+          <article class="bento-card insight-card zone-reporting" data-card="insight" data-zone="reporting">
+            <span class="mini-label">Insight</span>
+            <h2>Tento týden +18 % dokončených revizí</h2>
+            <p>Největší zrychlení přinesl modul QR kontrol a automatické připomínky technikům.</p>
+            <div class="sparkline" aria-label="Ilustrační trend">
+              <span style="height: 34%"></span>
+              <span style="height: 52%"></span>
+              <span style="height: 46%"></span>
+              <span style="height: 70%"></span>
+              <span style="height: 88%"></span>
+              <span style="height: 78%"></span>
+            </div>
+          </article>
+
+          <article class="bento-card modules-card zone-finance" data-card="market" data-zone="finance">
+            <div class="card-heading-row">
+              <div>
+                <span class="mini-label">Marketplace</span>
+                <h2>Dostupné moduly</h2>
+              </div>
+              <span class="soft-pill">bez sidebaru</span>
+            </div>
+            <ul class="module-mini-list">
+              <li>
+                <span>QR kontroly zařízení</span>
+                <button class="module-toggle" type="button" data-module="qr-kontroly">Zapnout</button>
+              </li>
+              <li>
+                <span>BOZP incidenty</span>
+                <button class="module-toggle" type="button" data-module="bozp-incidenty">Zapnout</button>
+              </li>
+              <li>
+                <span>Fakturace revizí</span>
+                <button class="module-toggle" type="button" data-module="fakturace">Zapnout</button>
+              </li>
+            </ul>
+            <button
+              class="secondary-cta"
+              type="button"
+              data-open-launcher
+              aria-controls="moduleLauncher"
+              aria-expanded="false"
+            >
+              Otevřít launcher modulů
+            </button>
+          </article>
+
+          <article class="bento-card focus-card zone-revize is-zone-active" data-card="focus" data-zone="revize">
+            <div class="focus-orbit" aria-hidden="true">
+              <span></span><span></span><span></span>
+            </div>
+            <span class="mini-label">Aktivní zóna</span>
+            <h2 id="focusZoneTitle">Revize & zařízení</h2>
+            <p id="focusZoneDescription">
+              Přehled zařízení, revizních lhůt, techniků a urgentních protokolů.
+            </p>
+            <div class="focus-stats">
+              <span><strong id="focusZoneCount">27</strong> položek</span>
+              <span id="focusZoneStatus">3 urgentní</span>
+            </div>
+          </article>
+        </section>
+      </main>
+    </div>
+
+    <nav class="mobile-bar" aria-label="Mobilní launcher zón">
+      <button class="mobile-zone-button is-active" type="button" data-zone="revize">
+        <span>⚡</span>
+        Revize
+      </button>
+      <button class="mobile-zone-button" type="button" data-zone="lide">
+        <span>◌</span>
+        Lidé
+      </button>
+      <button
+        class="mobile-launcher-button"
+        type="button"
+        data-open-launcher
+        aria-controls="moduleLauncher"
+        aria-expanded="false"
+      >
+        <span>▦</span>
+        Moduly
+      </button>
+      <button class="mobile-zone-button" type="button" data-zone="finance">
+        <span>₿</span>
+        Finance
+      </button>
+      <button class="mobile-zone-button" type="button" data-zone="reporting">
+        <span>◎</span>
+        Reporty
+      </button>
+    </nav>
+
+    <div
+      class="launcher-overlay"
+      id="moduleLauncher"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="launcherTitle"
+      aria-hidden="true"
+      hidden
+      inert
+    >
+      <button class="launcher-backdrop" type="button" data-close-launcher aria-label="Zavřít launcher modulů"></button>
+
+      <section class="launcher-panel" aria-describedby="launcherDescription">
+        <header class="launcher-header">
+          <div>
+            <p class="eyebrow"><span class="active-dot" aria-hidden="true"></span>Module launcher</p>
+            <h2 id="launcherTitle">Všechny moduly</h2>
+            <p id="launcherDescription">
+              Overlay přes pracovní plochu. Klik na modul zavře launcher a zvýrazní jeho zónu.
+            </p>
+          </div>
+          <button class="close-button" type="button" data-close-launcher aria-label="Zavřít">×</button>
+        </header>
+
+        <div class="launcher-status-row" aria-label="Legenda stavů modulů">
+          <span><i class="status-dot active"></i> aktivní</span>
+          <span><i class="status-dot available"></i> dostupný</span>
+          <span><i class="status-dot locked"></i> zamčený</span>
+        </div>
+
+        <div class="launcher-grid">
+          <section class="launcher-zone zone-revize" aria-label="Revize">
+            <h3>Revize & zařízení</h3>
+            <button class="module-card" type="button" data-module="revizni-plan" data-zone="revize" data-status="active">
+              <span class="module-state">Aktivní</span>
+              <strong class="module-title">Revizní plán</strong>
+              <small>Lhůty, protokoly a přiřazení technikům.</small>
+              <span class="module-action">Otevřít</span>
+            </button>
+            <button class="module-card" type="button" data-module="zarizeni" data-zone="revize" data-status="active">
+              <span class="module-state">Aktivní</span>
+              <strong class="module-title">Zařízení</strong>
+              <small>Karty zařízení, QR štítky a historie.</small>
+              <span class="module-action">Otevřít</span>
+            </button>
+            <button class="module-card" type="button" data-module="qr-kontroly" data-zone="revize" data-status="available">
+              <span class="module-state">Dostupný</span>
+              <strong class="module-title">QR kontroly</strong>
+              <small>Rychlé kontroly přímo v terénu.</small>
+              <span class="module-action">Zapnout</span>
+            </button>
+          </section>
+
+          <section class="launcher-zone zone-skoleni" aria-label="Školení">
+            <h3>Školení elektro</h3>
+            <button class="module-card" type="button" data-module="skoleni-elektro" data-zone="skoleni" data-status="active">
+              <span class="module-state">Aktivní</span>
+              <strong class="module-title">Školení elektro</strong>
+              <small>Termíny, docházka a certifikáty.</small>
+              <span class="module-action">Otevřít</span>
+            </button>
+            <button class="module-card" type="button" data-module="certifikaty" data-zone="skoleni" data-status="available">
+              <span class="module-state">Dostupný</span>
+              <strong class="module-title">Certifikáty</strong>
+              <small>Hlídání expirací a automatické výzvy.</small>
+              <span class="module-action">Zapnout</span>
+            </button>
+          </section>
+
+          <section class="launcher-zone zone-lide" aria-label="Lidé a smlouvy">
+            <h3>Lidé & smlouvy</h3>
+            <button class="module-card" type="button" data-module="lide-smlouvy" data-zone="lide" data-status="active">
+              <span class="module-state">Aktivní</span>
+              <strong class="module-title">Lidé & smlouvy</strong>
+              <small>Osoby, role, smlouvy a podpisové kroky.</small>
+              <span class="module-action">Otevřít</span>
+            </button>
+            <button class="module-card" type="button" data-module="onboarding" data-zone="lide" data-status="available">
+              <span class="module-state">Dostupný</span>
+              <strong class="module-title">Onboarding</strong>
+              <small>Checklist pro nové techniky a dodavatele.</small>
+              <span class="module-action">Zapnout</span>
+            </button>
+          </section>
+
+          <section class="launcher-zone zone-finance" aria-label="Finance">
+            <h3>Finance</h3>
+            <button class="module-card" type="button" data-module="fakturace" data-zone="finance" data-status="available">
+              <span class="module-state">Dostupný</span>
+              <strong class="module-title">Fakturace revizí</strong>
+              <small>Fakturační fronta a kontrola podkladů.</small>
+              <span class="module-action">Zapnout</span>
+            </button>
+            <button class="module-card" type="button" data-module="naklady" data-zone="finance" data-status="locked">
+              <span class="module-state">Zamčený</span>
+              <strong class="module-title">Náklady zakázek</strong>
+              <small>Porovnání nákladů, marže a cashflow.</small>
+              <span class="module-action">Žádat přístup</span>
+            </button>
+          </section>
+
+          <section class="launcher-zone zone-compliance" aria-label="Compliance a dokumenty">
+            <h3>Compliance & dokumenty</h3>
+            <button class="module-card" type="button" data-module="gdpr-registr" data-zone="dokumenty" data-status="active">
+              <span class="module-state">Aktivní</span>
+              <strong class="module-title">GDPR registr</strong>
+              <small>Evidence zpracování a auditní stopa.</small>
+              <span class="module-action">Otevřít</span>
+            </button>
+            <button class="module-card" type="button" data-module="bozp-incidenty" data-zone="bozp" data-status="available">
+              <span class="module-state">Dostupný</span>
+              <strong class="module-title">BOZP incidenty</strong>
+              <small>Hlášení událostí a nápravná opatření.</small>
+              <span class="module-action">Zapnout</span>
+            </button>
+            <button class="module-card" type="button" data-module="archiv-dokumentu" data-zone="dokumenty" data-status="locked">
+              <span class="module-state">Zamčený</span>
+              <strong class="module-title">Archiv dokumentů</strong>
+              <small>Řízené dokumenty, verze a retence.</small>
+              <span class="module-action">Žádat přístup</span>
+            </button>
+          </section>
+
+          <section class="launcher-zone zone-reporting" aria-label="Reporting">
+            <h3>Reporting</h3>
+            <button class="module-card" type="button" data-module="reporting" data-zone="reporting" data-status="available">
+              <span class="module-state">Dostupný</span>
+              <strong class="module-title">Manažerské reporty</strong>
+              <small>Exporty, trendy a compliance dashboardy.</small>
+              <span class="module-action">Zapnout</span>
+            </button>
+            <button class="module-card" type="button" data-module="ai-insighty" data-zone="reporting" data-status="available">
+              <span class="module-state">Dostupný</span>
+              <strong class="module-title">AI insighty</strong>
+              <small>Návrhy priorit a rizikové vzorce.</small>
+              <span class="module-action">Zapnout</span>
+            </button>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  </body>
+</html>

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compliance Ledger — iterace 04</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="ledger-shell">
+      <aside class="spine" aria-label="Spisová navigace">
+        <div class="spine__brand">
+          <div class="brand-mark">CL</div>
+          <div>
+            <p class="eyebrow">Evidence revizí</p>
+            <h1>Compliance Ledger</h1>
+          </div>
+        </div>
+
+        <div class="spine__case paper-cut">
+          <span>Spisová značka</span>
+          <strong>REV/ALFA/2026</strong>
+          <small>živý spis · 46 dokumentů</small>
+        </div>
+
+        <nav class="folder-tabs">
+          <a class="folder-tabs__item is-active" href="#overview">Přehled spisu</a>
+          <a class="folder-tabs__item" href="#deadlines">Lhůty</a>
+          <a class="folder-tabs__item" href="#revisions">Revize</a>
+          <a class="folder-tabs__item" href="#protocols">Protokoly</a>
+          <a class="folder-tabs__item" href="#defects">Závady</a>
+          <a class="folder-tabs__item" href="#people">Osoby</a>
+          <a class="folder-tabs__item" href="#contracts">Smlouvy</a>
+          <a class="folder-tabs__item" href="#gdpr">GDPR</a>
+          <a class="folder-tabs__item" href="#audit">Audit</a>
+        </nav>
+      </aside>
+
+      <main class="workspace" id="overview">
+        <header class="case-header paper-card paper-cut">
+          <div>
+            <p class="breadcrumb">Spisy / Revize provozoven / ALFA-2026 / Přehled compliance</p>
+            <h2>Provozovna ALFA — právní a provozní stav</h2>
+            <p class="muted">Auditní kniha s lhůtami, protokoly, podpisy a uzavřením dokumentů.</p>
+          </div>
+          <div class="header-actions">
+            <label class="search-box">
+              <span>Najít ve spise</span>
+              <input type="search" placeholder="číslo protokolu, osoba, závada…" />
+            </label>
+            <button class="formal-button" type="button">Nový záznam</button>
+            <button class="formal-button formal-button--ghost" type="button">Export spisu</button>
+          </div>
+        </header>
+
+        <section class="summary-grid" aria-label="Compliance summary">
+          <article class="summary-card paper-card paper-cut summary-card--red">
+            <span class="summary-card__label">Po lhůtě</span>
+            <strong>7</strong>
+            <p>záznamů vyžaduje okamžité rozhodnutí nebo doložení.</p>
+            <span class="stamp stamp--red">PO LHŮTĚ</span>
+          </article>
+          <article class="summary-card paper-card paper-cut summary-card--gold">
+            <span class="summary-card__label">Čeká na podpis</span>
+            <strong>12</strong>
+            <p>protokolů a smluv je připraveno k formálnímu uzavření.</p>
+            <span class="stamp stamp--gold">K PODPISU</span>
+          </article>
+          <article class="summary-card paper-card paper-cut summary-card--blue">
+            <span class="summary-card__label">Bez zařazení</span>
+            <strong>4</strong>
+            <p>dokumenty nejsou navázány na spisový modul.</p>
+            <span class="stamp stamp--blue">NEZAŘAZENO</span>
+          </article>
+          <article class="summary-card paper-card paper-cut summary-card--green">
+            <span class="summary-card__label">Uzavřeno tento týden</span>
+            <strong>18</strong>
+            <p>auditovatelných kroků bylo zapsáno do knihy.</p>
+            <span class="stamp stamp--green">UZAVŘENO</span>
+          </article>
+        </section>
+
+        <section class="dashboard-grid">
+          <article class="register-card paper-card paper-cut" id="deadlines">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Kniha povinností</p>
+                <h3>Lhůtová kniha</h3>
+              </div>
+              <label class="toggle-filter">
+                <input id="only-overdue" type="checkbox" />
+                <span>jen po lhůtě</span>
+              </label>
+            </div>
+
+            <div class="ledger-tabs" role="tablist" aria-label="Přepnutí záznamů">
+              <button class="ledger-tabs__tab is-active" type="button" role="tab" aria-selected="true" data-tab-target="deadlines-panel">Lhůty</button>
+              <button class="ledger-tabs__tab" type="button" role="tab" aria-selected="false" data-tab-target="documents-panel">Dokumenty</button>
+              <button class="ledger-tabs__tab" type="button" role="tab" aria-selected="false" data-tab-target="audit-panel">Audit</button>
+            </div>
+
+            <div class="tab-panel is-active" id="deadlines-panel" role="tabpanel">
+              <div class="ledger-table" aria-label="Lhůtová kniha">
+                <div class="ledger-table__head">
+                  <span>Termín</span>
+                  <span>Doména</span>
+                  <span>Odpovědná osoba</span>
+                  <span>Stav</span>
+                  <span>Akce</span>
+                </div>
+
+                <button class="ledger-row deadline-row" type="button" data-ref="LHK-2026-017" data-title="Roční revize elektroinstalace — hala B" data-domain="BOZP / Elektro" data-owner="Ing. Hana Kopecká" data-date="15. 06. 2026" data-status="overdue" data-status-label="Po lhůtě" data-overdue="true" data-checks="Objednávka revizního technika|Fotodokumentace rozvaděče|Protokol s podpisem odpovědné osoby">
+                  <span class="date-block"><strong>15. 06.</strong><small>2026</small></span>
+                  <span>BOZP / Elektro<br /><small>hala B, rozvaděč R3</small></span>
+                  <span>Ing. Hana Kopecká</span>
+                  <span><span class="stamp stamp--red">PO LHŮTĚ</span></span>
+                  <span class="row-action">Otevřít list</span>
+                </button>
+
+                <button class="ledger-row deadline-row" type="button" data-ref="LHK-2026-021" data-title="Doložení školení obsluhy VZV" data-domain="Školení / HR" data-owner="Petr Málek" data-date="24. 06. 2026" data-status="warning" data-status-label="Čeká na podpis" data-overdue="false" data-checks="Prezenční listina|Potvrzení školitele|Archivace do modulu Osoby">
+                  <span class="date-block"><strong>24. 06.</strong><small>2026</small></span>
+                  <span>Školení / HR<br /><small>sklad a expedice</small></span>
+                  <span>Petr Málek</span>
+                  <span><span class="stamp stamp--gold">K PODPISU</span></span>
+                  <span class="row-action">Otevřít list</span>
+                </button>
+
+                <button class="ledger-row deadline-row" type="button" data-ref="LHK-2026-024" data-title="Kontrola hasicích přístrojů" data-domain="PO / Objekt" data-owner="Martina Novotná" data-date="02. 07. 2026" data-status="review" data-status-label="V kontrole" data-overdue="false" data-checks="Soupis zařízení|Servisní list|Kontrola závad z minulé revize">
+                  <span class="date-block"><strong>02. 07.</strong><small>2026</small></span>
+                  <span>PO / Objekt<br /><small>administrativní budova</small></span>
+                  <span>Martina Novotná</span>
+                  <span><span class="stamp stamp--blue">V KONTROLE</span></span>
+                  <span class="row-action">Otevřít list</span>
+                </button>
+
+                <button class="ledger-row deadline-row" type="button" data-ref="LHK-2026-029" data-title="Revize zdvihacích zařízení" data-domain="Technologie" data-owner="Jan Šimek" data-date="08. 07. 2026" data-status="closed" data-status-label="Uzavřeno" data-overdue="false" data-checks="Protokol technika|Záznam o odstranění závad|Předání do archivu">
+                  <span class="date-block"><strong>08. 07.</strong><small>2026</small></span>
+                  <span>Technologie<br /><small>jeřábová dráha J2</small></span>
+                  <span>Jan Šimek</span>
+                  <span><span class="stamp stamp--green">UZAVŘENO</span></span>
+                  <span class="row-action">Otevřít list</span>
+                </button>
+              </div>
+              <p class="filter-note" id="filter-note">Zobrazeny jsou všechny lhůty spisu.</p>
+            </div>
+
+            <div class="tab-panel" id="documents-panel" role="tabpanel" hidden>
+              <div class="document-stack document-stack--inside">
+                <article class="document-slip">
+                  <span class="document-slip__ref">PROT-026/2026</span>
+                  <h4>Protokol elektro — hala B</h4>
+                  <p>Čeká na druhý podpis odpovědné osoby a doplnění přílohy.</p>
+                  <span class="stamp stamp--gold">K PODPISU</span>
+                </article>
+                <article class="document-slip">
+                  <span class="document-slip__ref">SML-014/2026</span>
+                  <h4>Dodatek servisní smlouvy PO</h4>
+                  <p>Právní kontrola ukončena, dokument není založen do modulu Smlouvy.</p>
+                  <span class="stamp stamp--blue">NEZAŘAZENO</span>
+                </article>
+                <article class="document-slip">
+                  <span class="document-slip__ref">SKOL-044/2026</span>
+                  <h4>Potvrzení školení VZV</h4>
+                  <p>Chybí podpis školitele, lhůta navazuje na knihu LHK-2026-021.</p>
+                  <span class="stamp stamp--red">PO LHŮTĚ</span>
+                </article>
+              </div>
+            </div>
+
+            <div class="tab-panel" id="audit-panel" role="tabpanel" hidden>
+              <ol class="audit-list audit-list--wide">
+                <li><time>20. 06. 2026 · 10:42</time><span>Hana Kopecká změnila stav LHK-2026-017 na „Po lhůtě“.</span></li>
+                <li><time>20. 06. 2026 · 09:18</time><span>Protokol PROT-026/2026 byl předán k podpisu.</span></li>
+                <li><time>19. 06. 2026 · 16:05</time><span>Auditní kontrola potvrdila návaznost na spis ALFA-2026.</span></li>
+                <li><time>18. 06. 2026 · 13:31</time><span>Do modulu GDPR byl vložen nový záznam o přístupech.</span></li>
+              </ol>
+            </div>
+          </article>
+
+          <article class="closing-card paper-card paper-cut" id="protocols">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Fronta uzavření</p>
+                <h3>Dokumenty čekající na uzavření</h3>
+              </div>
+              <span class="stamp stamp--gold">12 KUSŮ</span>
+            </div>
+
+            <div class="document-stack">
+              <article class="document-slip" data-document-card>
+                <div class="document-slip__topline">
+                  <span class="document-slip__ref">PROT-026/2026</span>
+                  <span class="stamp stamp--gold" data-doc-stamp>K PODPISU</span>
+                </div>
+                <h4>Protokol elektro — hala B</h4>
+                <p>Formální uzavření po podpisu odpovědné osoby.</p>
+                <label class="status-control">Stav dokumentu
+                  <select data-status-select>
+                    <option value="signature" selected>Čeká na podpis</option>
+                    <option value="review">V kontrole</option>
+                    <option value="closed">Uzavřeno</option>
+                    <option value="overdue">Po lhůtě</option>
+                  </select>
+                </label>
+              </article>
+
+              <article class="document-slip" data-document-card>
+                <div class="document-slip__topline">
+                  <span class="document-slip__ref">SML-014/2026</span>
+                  <span class="stamp stamp--blue" data-doc-stamp>V KONTROLE</span>
+                </div>
+                <h4>Dodatek servisní smlouvy PO</h4>
+                <p>Čeká na spisové zařazení a potvrzení právním oddělením.</p>
+                <label class="status-control">Stav dokumentu
+                  <select data-status-select>
+                    <option value="signature">Čeká na podpis</option>
+                    <option value="review" selected>V kontrole</option>
+                    <option value="closed">Uzavřeno</option>
+                    <option value="overdue">Po lhůtě</option>
+                  </select>
+                </label>
+              </article>
+
+              <article class="document-slip" data-document-card>
+                <div class="document-slip__topline">
+                  <span class="document-slip__ref">SKOL-044/2026</span>
+                  <span class="stamp stamp--red" data-doc-stamp>PO LHŮTĚ</span>
+                </div>
+                <h4>Potvrzení školení VZV</h4>
+                <p>Chybí podpis školitele a vazba na osobní složku zaměstnance.</p>
+                <label class="status-control">Stav dokumentu
+                  <select data-status-select>
+                    <option value="signature">Čeká na podpis</option>
+                    <option value="review">V kontrole</option>
+                    <option value="closed">Uzavřeno</option>
+                    <option value="overdue" selected>Po lhůtě</option>
+                  </select>
+                </label>
+              </article>
+            </div>
+          </article>
+
+          <article class="audit-card paper-card paper-cut" id="audit">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Audit trail</p>
+                <h3>Poslední významné události</h3>
+              </div>
+            </div>
+            <ol class="audit-list" id="audit-log">
+              <li><time>10:42</time><span>LHK-2026-017 označeno jako po lhůtě.</span></li>
+              <li><time>09:18</time><span>PROT-026/2026 předán k podpisu.</span></li>
+              <li><time>včera</time><span>SML-014/2026 doplněn o právní stanovisko.</span></li>
+              <li><time>18. 06.</time><span>Archivní kontrola potvrdila 42 návazností.</span></li>
+            </ol>
+          </article>
+
+          <section class="modules-card paper-card paper-cut" aria-label="Spisové moduly">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Spisové moduly</p>
+                <h3>Složky v živém spise</h3>
+              </div>
+              <span class="muted">dlaždice jako složky, nikoliv SaaS karty</span>
+            </div>
+            <div class="folder-grid">
+              <a class="folder-tile" id="revisions" href="#revisions"><span>REV</span><strong>Revize</strong><small>14 otevřených záznamů</small></a>
+              <a class="folder-tile" href="#protocols"><span>PRO</span><strong>Protokoly</strong><small>8 čeká na podpis</small></a>
+              <a class="folder-tile" id="defects" href="#defects"><span>ZAV</span><strong>Závady</strong><small>3 kritické vazby</small></a>
+              <a class="folder-tile" id="people" href="#people"><span>OSO</span><strong>Osoby</strong><small>školení a odpovědnosti</small></a>
+              <a class="folder-tile" id="contracts" href="#contracts"><span>SML</span><strong>Smlouvy</strong><small>2 k právní kontrole</small></a>
+              <a class="folder-tile" id="gdpr" href="#gdpr"><span>GDP</span><strong>GDPR</strong><small>přístupy a souhlasy</small></a>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <div class="panel-backdrop" data-panel-backdrop hidden></div>
+    <aside class="detail-panel paper-card paper-cut" data-detail-panel role="dialog" aria-modal="true" aria-hidden="true" aria-label="Detail listu spisu" hidden inert>
+      <button class="panel-close" type="button" data-close-panel aria-label="Zavřít detail">×</button>
+      <div class="detail-panel__header">
+        <p class="eyebrow">Pravý list spisu</p>
+        <strong data-detail-ref>LHK-2026-017</strong>
+        <span class="stamp stamp--red" data-detail-stamp>PO LHŮTĚ</span>
+      </div>
+      <h3 data-detail-title>Roční revize elektroinstalace — hala B</h3>
+      <dl class="detail-meta">
+        <div><dt>Doména</dt><dd data-detail-domain>BOZP / Elektro</dd></div>
+        <div><dt>Termín</dt><dd data-detail-date>15. 06. 2026</dd></div>
+        <div><dt>Odpovědná osoba</dt><dd data-detail-owner>Ing. Hana Kopecká</dd></div>
+      </dl>
+
+      <section class="checklist-section">
+        <h4>Odškrtávací protokol</h4>
+        <ul class="protocol-checklist" data-detail-checks></ul>
+      </section>
+
+      <section class="detail-audit">
+        <h4>Auditní stopa listu</h4>
+        <ol>
+          <li><time>dnes 10:42</time><span>Změna stavu zapsána do ledgeru.</span></li>
+          <li><time>včera 14:03</time><span>Přidána poznámka odpovědné osoby.</span></li>
+          <li><time>17. 06.</time><span>List svázán se spisem REV/ALFA/2026.</span></li>
+        </ol>
+      </section>
+
+      <div class="panel-actions">
+        <button class="formal-button" type="button" data-mark-closed>Označit jako uzavřeno</button>
+        <button class="formal-button formal-button--ghost" type="button" data-close-panel>Zavřít list</button>
+      </div>
+      <div class="stamp-burst" data-stamp-burst>UZAVŘENO</div>
+    </aside>
+
+    <script src="app.js"></script>
+  </body>
+</html>

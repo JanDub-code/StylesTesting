@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Industrial Ops Console — Iterace 01</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="drawer-open">
+    <div class="app-shell" id="appShell">
+      <aside class="sidebar" id="sidebar" aria-label="Provozní navigace">
+        <div class="sidebar__topline">
+          <div class="brand">
+            <div class="brand__mark" aria-hidden="true">ER</div>
+            <div class="brand__copy">
+              <strong>Evidence revizí</strong>
+              <span>OPS-CZ / CONTROL</span>
+            </div>
+          </div>
+          <button class="icon-button sidebar-toggle" id="sidebarToggle" type="button" aria-label="Sbalit sidebar" aria-expanded="true">
+            <span aria-hidden="true">◧</span>
+          </button>
+        </div>
+
+        <section class="today-need cut-md" aria-label="Dnes je potřeba">
+          <span class="eyebrow">Dnes je potřeba</span>
+          <strong>12 misí · 5 alarmů</strong>
+          <div class="need-grid" aria-label="Rychlý stav dne">
+            <span><b>03</b> po termínu</span>
+            <span><b>41</b> protokolů</span>
+          </div>
+        </section>
+
+        <nav class="nav-list" aria-label="Pracovní oblasti">
+          <button class="nav-item is-active" type="button" data-nav="Velín">
+            <span class="nav-icon" aria-hidden="true">⌁</span>
+            <span class="nav-label">Velín</span>
+            <span class="nav-signal" aria-hidden="true"></span>
+          </button>
+          <button class="nav-item" type="button" data-nav="Revize">
+            <span class="nav-icon" aria-hidden="true">▤</span>
+            <span class="nav-label">Revize</span>
+            <span class="nav-count">18</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="Zařízení">
+            <span class="nav-icon" aria-hidden="true">▧</span>
+            <span class="nav-label">Zařízení</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="Závady">
+            <span class="nav-icon" aria-hidden="true">⚠</span>
+            <span class="nav-label">Závady</span>
+            <span class="nav-count nav-count--danger">7</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="Lidé a doklady">
+            <span class="nav-icon" aria-hidden="true">◉</span>
+            <span class="nav-label">Lidé a doklady</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="Finance">
+            <span class="nav-icon" aria-hidden="true">₭</span>
+            <span class="nav-label">Finance</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="Reporting">
+            <span class="nav-icon" aria-hidden="true">▥</span>
+            <span class="nav-label">Reporting</span>
+          </button>
+        </nav>
+
+        <div class="sidebar__footer cut-sm">
+          <div class="operator-avatar" aria-hidden="true">JK</div>
+          <div class="operator-copy">
+            <strong>Jana K.</strong>
+            <span><i class="dot dot--ok"></i> sync 09:42 · online</span>
+          </div>
+        </div>
+      </aside>
+
+      <button class="mobile-backdrop" id="mobileBackdrop" type="button" aria-label="Zavřít navigaci"></button>
+
+      <main class="workspace">
+        <header class="topbar">
+          <button class="icon-button mobile-menu" id="mobileMenu" type="button" aria-label="Otevřít navigaci">
+            <span aria-hidden="true">☰</span>
+          </button>
+          <label class="command-search" aria-label="Globální hledání">
+            <span aria-hidden="true">⌘K</span>
+            <input type="search" placeholder="Hledat zařízení, protokol, technika…" />
+          </label>
+          <div class="topbar__actions">
+            <span class="online-pill"><i class="dot dot--ok"></i> Online</span>
+            <button class="icon-button" type="button" aria-label="Notifikace">◌<sup>5</sup></button>
+            <button class="primary-action" id="newRevision" type="button">+ Nová revize</button>
+          </div>
+        </header>
+
+        <section class="hero cut-lg">
+          <div>
+            <span class="eyebrow">Industrial Ops Console</span>
+            <h1 id="screenTitle">Velín revizí</h1>
+            <p>Rizika, termíny, zásahy a auditní stopa v jednom provozním přehledu.</p>
+          </div>
+          <div class="hero__right" aria-label="Stav směny">
+            <span class="pulse-dot" aria-hidden="true"></span>
+            <div>
+              <strong>Směna A aktivní</strong>
+              <span>7 techniků v terénu · SLA monitor běží</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="status-strip" aria-label="Operational status strip">
+          <article class="status-tile cut-sm status-tile--ok">
+            <span>Napojení</span>
+            <strong>ONLINE</strong>
+            <small>API / DB / terénní sync</small>
+          </article>
+          <article class="status-tile cut-sm status-tile--danger">
+            <span>Alarmy</span>
+            <strong>5</strong>
+            <small>2 kritické · 3 varování</small>
+          </article>
+          <article class="status-tile cut-sm">
+            <span>Poslední synchronizace</span>
+            <strong>09:42</strong>
+            <small>před 4 minutami</small>
+          </article>
+          <article class="status-tile cut-sm status-tile--cyan">
+            <span>Dokončeno dnes</span>
+            <strong>23 / 41</strong>
+            <small>56 % denního plánu</small>
+          </article>
+        </section>
+
+        <section class="dashboard-grid" aria-label="Dashboard velínu">
+          <article class="panel risk-panel cut-lg">
+            <div class="panel__header">
+              <div>
+                <span class="eyebrow">Hlavní fronta rizik</span>
+                <h2>Riziková fronta</h2>
+              </div>
+              <span class="panel-meter"><b id="riskCount">5</b> položek</span>
+            </div>
+
+            <div class="filter-group" aria-label="Filtr rizik">
+              <button class="filter-chip is-active" type="button" data-filter="all">Vše</button>
+              <button class="filter-chip" type="button" data-filter="overdue">Po termínu</button>
+              <button class="filter-chip" type="button" data-filter="warning">Varování</button>
+              <button class="filter-chip" type="button" data-filter="ok">OK</button>
+            </div>
+
+            <div class="risk-list" id="riskList">
+              <button class="risk-card cut-md is-selected" type="button" data-risk-id="overdue" data-risk-status="overdue">
+                <span class="severity severity--danger">Kritické</span>
+                <strong>Revize po termínu</strong>
+                <span class="risk-card__meta">18 revizí · nejstarší 14 dnů · SLA hoří</span>
+                <span class="risk-card__footer"><b>R-142</b><em>Otevřít detail →</em></span>
+              </button>
+              <button class="risk-card cut-md" type="button" data-risk-id="invalid" data-risk-status="overdue">
+                <span class="severity severity--danger">Kritické</span>
+                <strong>Zařízení bez platné revize</strong>
+                <span class="risk-card__meta">6 zařízení · výroba / sklad · odstávka možná</span>
+                <span class="risk-card__footer"><b>Z-087</b><em>Otevřít detail →</em></span>
+              </button>
+              <button class="risk-card cut-md" type="button" data-risk-id="defects" data-risk-status="warning">
+                <span class="severity severity--warning">Varování</span>
+                <strong>Závady A</strong>
+                <span class="risk-card__meta">7 otevřených · 3 bez vlastníka · eskalace 15:00</span>
+                <span class="risk-card__footer"><b>A-031</b><em>Otevřít detail →</em></span>
+              </button>
+              <button class="risk-card cut-md" type="button" data-risk-id="protocols" data-risk-status="warning">
+                <span class="severity severity--warning">Varování</span>
+                <strong>Chybějící protokoly</strong>
+                <span class="risk-card__meta">9 chybí podpis · 4 čekají na upload</span>
+                <span class="risk-card__footer"><b>P-224</b><em>Otevřít detail →</em></span>
+              </button>
+              <button class="risk-card cut-md" type="button" data-risk-id="permits" data-risk-status="ok">
+                <span class="severity severity--ok">OK</span>
+                <strong>Expirovaná oprávnění</strong>
+                <span class="risk-card__meta">0 kritických · 2 expirují do 30 dnů</span>
+                <span class="risk-card__footer"><b>L-019</b><em>Otevřít detail →</em></span>
+              </button>
+            </div>
+          </article>
+
+          <article class="panel missions-panel cut-md">
+            <div class="panel__header">
+              <div>
+                <span class="eyebrow">Dnešní mise</span>
+                <h2>Technici v poli</h2>
+              </div>
+              <button class="ghost-action" type="button">Plán směny</button>
+            </div>
+            <div class="mission-list">
+              <div class="mission-row">
+                <time>08:30</time>
+                <div><strong>Kotelna Sever</strong><span>elektro revize · Petr H.</span></div>
+                <span class="mission-state mission-state--run">Probíhá</span>
+                <button type="button">Detail</button>
+              </div>
+              <div class="mission-row">
+                <time>10:15</time>
+                <div><strong>Sklad B12</strong><span>tlakové nádoby · Dana M.</span></div>
+                <span class="mission-state mission-state--warn">Čeká</span>
+                <button type="button">Detail</button>
+              </div>
+              <div class="mission-row">
+                <time>13:00</time>
+                <div><strong>Admin HQ</strong><span>školení BOZP · Adam V.</span></div>
+                <span class="mission-state mission-state--ok">Ready</span>
+                <button type="button">Detail</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel coverage-panel cut-md">
+            <div class="panel__header">
+              <div>
+                <span class="eyebrow">Coverage map</span>
+                <h2>Pokrytí zakázek</h2>
+              </div>
+              <span class="map-code">GRID 12×08</span>
+            </div>
+            <div class="ops-map" aria-label="Schematic grid coverage mapa">
+              <span class="map-node map-node--danger" style="--x: 19%; --y: 32%"></span>
+              <span class="map-node map-node--ok" style="--x: 42%; --y: 58%"></span>
+              <span class="map-node map-node--warn" style="--x: 67%; --y: 41%"></span>
+              <span class="map-node map-node--cyan" style="--x: 78%; --y: 68%"></span>
+              <span class="map-route" aria-hidden="true"></span>
+            </div>
+          </article>
+
+          <article class="panel health-panel cut-md">
+            <div class="panel__header">
+              <div>
+                <span class="eyebrow">Modulové zdraví</span>
+                <h2>Health cards</h2>
+              </div>
+              <span class="health-score">91 %</span>
+            </div>
+            <div class="health-grid">
+              <div class="health-card"><span>Revize</span><b>86 %</b><i class="bar" style="--value: 86%"></i></div>
+              <div class="health-card"><span>Školení</span><b>94 %</b><i class="bar" style="--value: 94%"></i></div>
+              <div class="health-card"><span>Smlouvy</span><b>78 %</b><i class="bar bar--warn" style="--value: 78%"></i></div>
+              <div class="health-card"><span>GDPR</span><b>99 %</b><i class="bar" style="--value: 99%"></i></div>
+              <div class="health-card"><span>Reporting</span><b>97 %</b><i class="bar" style="--value: 97%"></i></div>
+            </div>
+          </article>
+        </section>
+      </main>
+
+      <aside class="detail-drawer cut-lg" id="detailDrawer" aria-label="Detail rizikové fronty" aria-hidden="false">
+        <div class="drawer__header">
+          <div>
+            <span class="eyebrow">Detail fronty</span>
+            <h2 id="drawerTitle">Revize po termínu</h2>
+          </div>
+          <button class="icon-button" id="drawerClose" type="button" aria-label="Zavřít detail">×</button>
+        </div>
+        <div class="drawer__severity" id="drawerSeverity">Kritické</div>
+        <p class="drawer__lead" id="drawerLead">18 revizí je po termínu, nejstarší položka překračuje SLA o 14 dnů.</p>
+        <dl class="drawer__facts">
+          <div><dt>Kód</dt><dd id="drawerCode">R-142</dd></div>
+          <div><dt>Vlastník</dt><dd id="drawerOwner">Marek L.</dd></div>
+          <div><dt>Termín</dt><dd id="drawerDue">Dnes 15:00</dd></div>
+        </dl>
+        <div class="drawer__checklist">
+          <h3>Checklist zásahu</h3>
+          <label><input type="checkbox" checked /> ověřit dostupnost technika</label>
+          <label><input type="checkbox" /> potvrdit odstávku s klientem</label>
+          <label><input type="checkbox" /> doplnit protokol po revizi</label>
+        </div>
+        <div class="drawer__actions">
+          <button class="secondary-action" type="button" data-toast="Položka přiřazena operátorovi.">Přiřadit</button>
+          <button class="secondary-action" type="button" data-toast="Návrh termínu byl uložen.">Naplánovat</button>
+          <button class="primary-action" type="button" data-toast="Fronta označena jako řešená.">Označit jako řešené</button>
+        </div>
+      </aside>
+    </div>
+
+    <nav class="mobile-dock" aria-label="Mobilní status bar">
+      <button class="is-active" type="button" data-mobile-nav="Velín">Velín</button>
+      <button type="button" data-mobile-nav="Rizika">Rizika <b>5</b></button>
+      <button type="button" data-mobile-nav="Mise">Mise</button>
+    </nav>
+
+    <div class="toast" id="toast" role="status" aria-live="polite">Nová revize připravena.</div>
+
+    <script src="app.js"></script>
+  </body>
+</html>

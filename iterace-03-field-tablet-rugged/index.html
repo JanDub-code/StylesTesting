@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Iterace 03 — Field Tablet Rugged</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="app-shell" data-view="today">
+      <header class="topbar" aria-label="Stav směny">
+        <div class="brand-block">
+          <span class="product-mark" aria-hidden="true">R3</span>
+          <div>
+            <p class="eyebrow">Field tablet</p>
+            <h1>Směna v terénu</h1>
+          </div>
+        </div>
+
+        <div class="status-strip">
+          <button class="status-pill online" type="button" id="connectionToggle" aria-pressed="true">
+            <span class="status-dot" aria-hidden="true"></span>
+            <span id="connectionText">Online</span>
+          </button>
+          <div class="header-meta">
+            <span>Technik: <strong>Jan Novák</strong></span>
+            <span>Zakázka: <strong>RV-2406-18</strong></span>
+          </div>
+          <button class="touch-toggle" type="button" id="touchToggle" aria-pressed="false">
+            Zvětšit dotyk
+          </button>
+        </div>
+      </header>
+
+      <main class="workspace" id="mainContent">
+        <section class="view view-active" id="view-today" aria-labelledby="todayTitle">
+          <div class="hero-grid">
+            <article class="rugged-card shift-card">
+              <div class="section-kicker">Dnešní směna</div>
+              <h2 id="todayTitle">4 zastávky · 2 rizika · 1 podpis čeká</h2>
+              <p class="large-copy">Aktuální práce je připravená offline. Priorita: rozvaděč R12 a chybějící podpis správce.</p>
+              <div class="shift-metrics" aria-label="Souhrn směny">
+                <span><strong id="doneCount">1</strong><small>hotovo</small></span>
+                <span><strong id="remainingCount">3</strong><small>čeká</small></span>
+                <span><strong>18 km</strong><small>trasa</small></span>
+              </div>
+              <button class="primary-action" type="button" id="nextWorkBtn">Zahájit další práci</button>
+            </article>
+
+            <article class="rugged-card offline-box" aria-live="polite">
+              <div class="section-kicker">Sync & offline</div>
+              <h2 id="syncTitle">Vše synchronizováno</h2>
+              <p id="syncDetail">Poslední sync: 08:42 · lokální balík map připraven.</p>
+              <div class="sync-gauge" aria-hidden="true"><span id="syncGauge"></span></div>
+              <button class="secondary-action" type="button" id="forceSyncBtn">Vynutit sync</button>
+            </article>
+          </div>
+
+          <section class="rugged-card route-panel" aria-labelledby="routeTitle">
+            <div class="panel-heading">
+              <div>
+                <div class="section-kicker">Route timeline</div>
+                <h2 id="routeTitle">Trasa dnes</h2>
+              </div>
+              <span class="eta-badge">ETA 15:40</span>
+            </div>
+
+            <ol class="route-list" id="routeList">
+              <li class="route-stop done" data-stop="0">
+                <div class="stop-time">08:10</div>
+                <div class="stop-body">
+                  <button class="stop-select" type="button">
+                    <span class="stop-title">Administrativní budova A</span>
+                    <span class="stop-meta">EPS kontrola · hotovo</span>
+                  </button>
+                  <button class="stop-done" type="button" aria-pressed="true">Hotovo</button>
+                </div>
+              </li>
+              <li class="route-stop current risk" data-stop="1">
+                <div class="stop-time">10:30</div>
+                <div class="stop-body">
+                  <button class="stop-select" type="button">
+                    <span class="stop-title">Hala 3 · rozvaděč R12</span>
+                    <span class="stop-meta">Aktuální · riziko A</span>
+                  </button>
+                  <button class="stop-done" type="button" aria-pressed="false">Označit hotovo</button>
+                </div>
+              </li>
+              <li class="route-stop risk" data-stop="2">
+                <div class="stop-time">12:20</div>
+                <div class="stop-body">
+                  <button class="stop-select" type="button">
+                    <span class="stop-title">Sklad chemie · vrata Jih</span>
+                    <span class="stop-meta">Čeká · chybí podpis</span>
+                  </button>
+                  <button class="stop-done" type="button" aria-pressed="false">Označit hotovo</button>
+                </div>
+              </li>
+              <li class="route-stop" data-stop="3">
+                <div class="stop-time">14:05</div>
+                <div class="stop-body">
+                  <button class="stop-select" type="button">
+                    <span class="stop-title">Servisní dvůr · nouzové osvětlení</span>
+                    <span class="stop-meta">Čeká · běžná revize</span>
+                  </button>
+                  <button class="stop-done" type="button" aria-pressed="false">Označit hotovo</button>
+                </div>
+              </li>
+            </ol>
+          </section>
+
+          <section class="quick-actions" aria-labelledby="quickTitle">
+            <div class="panel-heading compact">
+              <div>
+                <div class="section-kicker">Rychlé akce</div>
+                <h2 id="quickTitle">Jedním dotykem</h2>
+              </div>
+            </div>
+            <div class="quick-grid">
+              <button class="quick-action scan" type="button">
+                <span aria-hidden="true">▣</span>
+                Naskenovat QR
+              </button>
+              <button class="quick-action photo" type="button" id="openPhotoModal">
+                <span aria-hidden="true">●</span>
+                Přidat fotku závady
+              </button>
+              <button class="quick-action measure" type="button">
+                <span aria-hidden="true">↯</span>
+                Spustit měření
+              </button>
+              <button class="quick-action dictate" type="button">
+                <span aria-hidden="true">≋</span>
+                Diktovat poznámku
+              </button>
+            </div>
+          </section>
+
+          <section class="risk-stack" aria-labelledby="riskTitle">
+            <div class="panel-heading compact">
+              <div>
+                <div class="section-kicker">Risk alerts</div>
+                <h2 id="riskTitle">Vyžaduje reakci</h2>
+              </div>
+            </div>
+            <article class="rugged-alert danger">
+              <strong>Závada A</strong>
+              <span>Rozvaděč R12 má poškozené krytí. Vyfotit a eskalovat před odjezdem.</span>
+            </article>
+            <article class="rugged-alert warning">
+              <strong>Chybí podpis</strong>
+              <span>Správce skladu musí potvrdit převzetí protokolu.</span>
+            </article>
+            <article class="rugged-alert late">
+              <strong>Revize po termínu</strong>
+              <span>Nouzové osvětlení je 6 dní po plánovaném datu.</span>
+            </article>
+          </section>
+        </section>
+
+        <section class="view" id="view-route" aria-labelledby="routeViewTitle">
+          <article class="rugged-card work-panel wide-panel">
+            <div class="section-kicker">Trasa</div>
+            <h2 id="routeViewTitle">Navigační pracovní panel</h2>
+            <p class="large-copy">Sekundární pohled pro tablet: velké kroky trasy, žádná jemná mapa. Stiskni zastávku v timeline a prototyp ji označí jako aktuální.</p>
+            <div class="route-summary-grid">
+              <div><strong>18 km</strong><span>zbývá</span></div>
+              <div><strong>3</strong><span>zastávky</span></div>
+              <div><strong>2</strong><span>rizika</span></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="view" id="view-inspection" aria-labelledby="inspectionTitle">
+          <article class="rugged-card work-panel wide-panel">
+            <div class="section-kicker">Revize</div>
+            <h2 id="inspectionTitle">Kontrolní režim v rukavicích</h2>
+            <div class="check-grid">
+              <button type="button" class="check-tile">✓ Kryt zařízení</button>
+              <button type="button" class="check-tile">✓ Štítek čitelný</button>
+              <button type="button" class="check-tile danger-outline">! Izolace ověřit</button>
+              <button type="button" class="check-tile">+ Přidat měření</button>
+            </div>
+          </article>
+        </section>
+
+        <section class="view" id="view-defects" aria-labelledby="defectsTitle">
+          <article class="rugged-card work-panel wide-panel">
+            <div class="section-kicker">Závady</div>
+            <h2 id="defectsTitle">Evidence závad</h2>
+            <p class="large-copy">Rychlý seznam závad pro terén. Hlavní akce je fotka, poznámka a eskalace.</p>
+            <button class="primary-action" type="button" id="openPhotoModalSecondary">Přidat fotku závady</button>
+          </article>
+        </section>
+      </main>
+
+      <nav class="command-bar" aria-label="Hlavní command bar">
+        <button class="command-item active" type="button" data-target="today" aria-pressed="true">
+          <span>Dnes</span>
+          <small>směna</small>
+        </button>
+        <button class="command-item" type="button" data-target="route" aria-pressed="false">
+          <span>Trasa</span>
+          <small>ETA</small>
+        </button>
+        <button class="command-item" type="button" data-target="inspection" aria-pressed="false">
+          <span>Revize</span>
+          <small>check</small>
+        </button>
+        <button class="command-item" type="button" data-target="defects" aria-pressed="false">
+          <span>Závady</span>
+          <small>foto</small>
+        </button>
+        <button class="command-item menu-trigger" type="button" id="menuTrigger" aria-expanded="false" aria-controls="toolDrawer">
+          <span>Menu</span>
+          <small>nástroje</small>
+        </button>
+      </nav>
+    </div>
+
+    <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+    <aside class="tool-drawer" id="toolDrawer" aria-hidden="true" aria-labelledby="drawerTitle">
+      <div class="drawer-header">
+        <div>
+          <p class="eyebrow">Tool drawer</p>
+          <h2 id="drawerTitle">Terénní nástroje</h2>
+        </div>
+        <button class="drawer-close" type="button" id="drawerClose">Zavřít</button>
+      </div>
+
+      <div class="mode-switch" aria-label="Přepínač režimu">
+        <button type="button" class="active">Terén</button>
+        <button type="button">Kancelář</button>
+      </div>
+
+      <div class="drawer-actions">
+        <button type="button" data-drawer-target="today">Dnes · směna</button>
+        <button type="button" data-drawer-target="route">Trasa · navigace</button>
+        <button type="button" data-drawer-target="inspection">Revize · checklist</button>
+        <button type="button" data-drawer-target="defects">Závady · fotky</button>
+      </div>
+
+      <div class="drawer-info rugged-card">
+        <span>Baterie tabletu</span>
+        <strong>82 %</strong>
+        <small>Odolný režim displeje zapnutý</small>
+      </div>
+
+      <div class="drawer-info rugged-card">
+        <span>Sync fronta</span>
+        <strong id="drawerSyncCount">0 změn</strong>
+        <small id="drawerSyncText">Připraveno k práci online</small>
+      </div>
+
+      <button class="secondary-action drawer-touch" type="button" id="drawerTouchToggle">Zvětšit dotykové cíle</button>
+    </aside>
+
+    <div class="modal-layer" id="photoModal" role="dialog" aria-modal="true" aria-labelledby="photoModalTitle" hidden>
+      <div class="modal-card rugged-card">
+        <div class="modal-grip" aria-hidden="true"></div>
+        <div class="modal-heading">
+          <div>
+            <p class="eyebrow">Závada</p>
+            <h2 id="photoModalTitle">Přidat fotku závady</h2>
+          </div>
+          <button class="modal-close" type="button" id="closePhotoModal">Zavřít</button>
+        </div>
+        <div class="photo-placeholder" aria-label="Placeholder kamery">
+          <span aria-hidden="true">▧</span>
+          <strong>Kamera není v prototypu napojená</strong>
+          <p>Ukázka workflow: vyfotit závadu, přidat poznámku a uložit offline.</p>
+        </div>
+        <label class="field-label" for="defectNote">Krátká poznámka</label>
+        <textarea id="defectNote" rows="3" placeholder="Např. poškozené krytí, přístup zablokován..."></textarea>
+        <div class="modal-actions">
+          <button class="secondary-action" type="button" id="cancelPhotoModal">Zrušit</button>
+          <button class="primary-action" type="button" id="savePhotoModal">Uložit offline</button>
+        </div>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
