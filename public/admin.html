@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Admin výsledky ankety</title>
+    <title>Admin v&yacute;sledky ankety</title>
     <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
@@ -11,10 +11,10 @@
       <section class="intro-panel" aria-labelledby="adminTitle">
         <div>
           <p class="eyebrow">Admin</p>
-          <h1 id="adminTitle">Výsledky ankety designů</h1>
-          <p class="lead">Souhrn je chráněný admin relací. Veřejná anketa globální výsledky nezobrazuje.</p>
+          <h1 id="adminTitle">V&yacute;sledky ankety design&uring;</h1>
+          <p class="lead">Souhrn je chr&aacute;n&#283;n&yacute; admin relac&iacute;. Ve&#345;ejn&aacute; anketa glob&aacute;ln&iacute; v&yacute;sledky nezobrazuje.</p>
         </div>
-        <a class="secondary-button" href="/">Zpět na anketu</a>
+        <a class="secondary-button" href="/">Zp&#283;t na anketu</a>
       </section>
 
       <form class="admin-token-panel" id="tokenForm">
@@ -22,26 +22,26 @@
           <span>Admin token</span>
           <input id="adminToken" type="password" autocomplete="current-password" placeholder="ADMIN_TOKEN" />
         </label>
-        <button class="primary-button" type="submit">Přihlásit a načíst</button>
-        <button class="secondary-button" id="exportCsv" type="button" disabled>Stáhnout CSV</button>
-        <button class="secondary-button" id="logoutButton" type="button" hidden>Odhlásit</button>
+        <button class="primary-button" type="submit">P&#345;ihl&aacute;sit a na&#269;&iacute;st</button>
+        <button class="secondary-button" id="exportCsv" type="button" disabled>St&aacute;hnout CSV</button>
+        <button class="secondary-button" id="logoutButton" type="button" hidden>Odhl&aacute;sit</button>
       </form>
 
       <section class="results-grid" id="results" hidden>
         <article class="result-card">
-          <span>Počet odeslání</span>
+          <span>Po&#269;et odesl&aacute;n&iacute;</span>
           <strong id="submissionCount">0</strong>
           <small id="generatedAt">-</small>
         </article>
         <article class="result-card result-card--wide">
-          <h2>Průměr podle návrhu</h2>
+          <h2>Pr&uring;m&#283;r podle n&aacute;vrhu</h2>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Návrh</th>
-                  <th>Hlasů</th>
-                  <th>Průměr</th>
+                  <th>N&aacute;vrh</th>
+                  <th>Hlas&uring;</th>
+                  <th>Pr&uring;m&#283;r</th>
                   <th>Min</th>
                   <th>Max</th>
                 </tr>
@@ -51,18 +51,35 @@
           </div>
         </article>
         <article class="result-card result-card--wide">
-          <h2>Rozpad podle věku</h2>
+          <h2>Rozpad podle v&#283;ku</h2>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Návrh</th>
-                  <th>Věk</th>
-                  <th>Hlasů</th>
-                  <th>Průměr</th>
+                  <th>N&aacute;vrh</th>
+                  <th>V&#283;k</th>
+                  <th>Hlas&uring;</th>
+                  <th>Pr&uring;m&#283;r</th>
                 </tr>
               </thead>
               <tbody id="ageRows"></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="result-card result-card--wide">
+          <h2>Pozn&aacute;mky k jednotliv&yacute;m hodnocen&iacute;m</h2>
+          <div class="table-wrap">
+            <table class="feedback-table">
+              <thead>
+                <tr>
+                  <th>Odesl&aacute;n&iacute;</th>
+                  <th>V&#283;k</th>
+                  <th>N&aacute;vrh</th>
+                  <th>Sk&oacute;re</th>
+                  <th>Pozn&aacute;mka</th>
+                </tr>
+              </thead>
+              <tbody id="feedbackRows"></tbody>
             </table>
           </div>
         </article>

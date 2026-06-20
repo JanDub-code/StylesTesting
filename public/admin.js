@@ -7,6 +7,7 @@ const submissionCount = document.querySelector("#submissionCount");
 const generatedAt = document.querySelector("#generatedAt");
 const summaryRows = document.querySelector("#summaryRows");
 const ageRows = document.querySelector("#ageRows");
+const feedbackRows = document.querySelector("#feedbackRows");
 const toast = document.querySelector("#toast");
 
 tokenForm.addEventListener("submit", async (event) => {
@@ -108,10 +109,27 @@ function renderResults(data) {
     .map(
       (row) => `
         <tr>
-          <td>${escapeHtml(row.design_id)}</td>
+          <td><strong>${escapeHtml(row.iteration)} &middot; ${escapeHtml(row.title)}</strong></td>
           <td>${escapeHtml(row.age_range)}</td>
           <td>${row.vote_count}</td>
           <td>${formatScore(row.average_score)}</td>
+        </tr>
+      `
+    )
+    .join("");
+
+  feedbackRows.innerHTML = (data.feedback || [])
+    .map(
+      (row) => `
+        <tr>
+          <td>
+            <strong>#${row.submission_id}</strong>
+            <small>${formatDate(row.created_at)}</small>
+          </td>
+          <td>${escapeHtml(row.age_range)}</td>
+          <td><strong>${escapeHtml(row.iteration)} &middot; ${escapeHtml(row.title)}</strong></td>
+          <td>${row.score}</td>
+          <td class="feedback-note">${escapeHtml(row.note || "-")}</td>
         </tr>
       `
     )
@@ -120,6 +138,10 @@ function renderResults(data) {
 
 function formatScore(value) {
   return typeof value === "number" ? value.toLocaleString("cs-CZ", { maximumFractionDigits: 2 }) : "-";
+}
+
+function formatDate(value) {
+  return value ? new Date(value).toLocaleString("cs-CZ") : "-";
 }
 
 function showToast(message) {

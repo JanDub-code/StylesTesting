@@ -193,7 +193,7 @@ app.get("/api/results", requireAdmin, async (_req, res, next) => {
   }
 
   try {
-    const [summary, ageBreakdown, totals] = await Promise.all([
+    const [summary, ageBreakdown, totals, feedback] = await Promise.all([
       pool.query(
         `select design_id, count(*)::int as vote_count, round(avg(score)::numeric, 2)::float as average_score,
                 min(score)::int as min_score, max(score)::int as max_score
@@ -210,13 +210,23 @@ app.get("/api/results", requireAdmin, async (_req, res, next) => {
          order by s.design_id asc, sub.age_range asc`
       ),
       pool.query(
-        `select count(*)::int as submission_count,
-                jsonb_object_agg(age_range, count_per_age order by age_range) as age_counts
-         from (
-           select age_range, count(*)::int as count_per_age
-           from submissions
-           group by age_range
-         ) age_totals`
+        `select
+           (select count(*)::int from submissions) as submission_count,
+           coalesce((
+             select jsonb_object_agg(age_range, count_per_age order by age_range)
+             from (
+               select age_range, count(*)::int as count_per_age
+               from submissions
+               group by age_range
+             ) age_totals
+           ), '{}'::jsonb) as age_counts`
+      ),
+      pool.query(
+        `select sub.id as submission_id, sub.age_range, sub.created_at, sub.updated_at,
+                s.design_id, s.score, s.note
+         from submissions sub
+         join scores s on s.submission_id = sub.id
+         order by sub.created_at desc, sub.id desc, s.design_id asc`
       )
     ]);
 
@@ -230,7 +240,16 @@ app.get("/api/results", requireAdmin, async (_req, res, next) => {
         title: designMap.get(row.design_id)?.title || row.design_id,
         iteration: designMap.get(row.design_id)?.iteration || ""
       })),
-      ageBreakdown: ageBreakdown.rows
+      ageBreakdown: ageBreakdown.rows.map((row) => ({
+        ...row,
+        title: designMap.get(row.design_id)?.title || row.design_id,
+        iteration: designMap.get(row.design_id)?.iteration || ""
+      })),
+      feedback: feedback.rows.map((row) => ({
+        ...row,
+        title: designMap.get(row.design_id)?.title || row.design_id,
+        iteration: designMap.get(row.design_id)?.iteration || ""
+      }))
     });
   } catch (error) {
     next(error);

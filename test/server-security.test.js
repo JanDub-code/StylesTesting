@@ -1,5 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const Module = require("node:module");
 
 const SERVER_PATH = require.resolve("../server");
 const DEFAULT_ENV = {
@@ -32,6 +33,34 @@ function loadApp(env = {}) {
   Object.assign(process.env, DEFAULT_ENV, env);
   delete require.cache[SERVER_PATH];
   return require("../server").app;
+}
+
+function loadAppWithPool(fakePool, env = {}) {
+  for (const key of ENV_KEYS) {
+    delete process.env[key];
+  }
+  Object.assign(process.env, DEFAULT_ENV, {
+    DATABASE_URL: "postgres://survey:password@127.0.0.1:5432/survey"
+  }, env);
+  delete require.cache[SERVER_PATH];
+
+  const originalLoad = Module._load;
+  Module._load = function patchedLoad(request, parent, isMain) {
+    if (request === "pg") {
+      return {
+        Pool: function Pool() {
+          return fakePool;
+        }
+      };
+    }
+    return originalLoad.call(this, request, parent, isMain);
+  };
+
+  try {
+    return require("../server").app;
+  } finally {
+    Module._load = originalLoad;
+  }
 }
 
 async function request(app, path, options = {}) {
@@ -127,6 +156,66 @@ test("admin browser login exchanges the token for an HttpOnly session cookie", a
     }
   });
   assert.equal(crossSiteResponse.status, 401);
+});
+
+test("admin results count submissions, not age buckets", async () => {
+  const fakePool = {
+    async query(sql) {
+      const compactSql = sql.replace(/\s+/g, " ").trim();
+
+      if (compactSql.includes("from scores group by design_id")) {
+        return { rows: [] };
+      }
+      if (compactSql.includes("from scores s join submissions sub")) {
+        return { rows: [] };
+      }
+      if (compactSql.includes("as submission_count")) {
+        assert.match(compactSql, /select count\(\*\)::int from submissions/);
+        assert.doesNotMatch(compactSql, /^select count\(\*\)::int as submission_count, jsonb_object_agg/);
+        return {
+          rows: [{
+            submission_count: 2,
+            age_counts: { "35-44": 2 }
+          }]
+        };
+      }
+      if (compactSql.includes("s.note") && compactSql.includes("join scores s on s.submission_id = sub.id")) {
+        return {
+          rows: [{
+            submission_id: 1,
+            age_range: "35-44",
+            created_at: "2026-06-20T12:00:00.000Z",
+            updated_at: "2026-06-20T12:00:00.000Z",
+            design_id: "industrial-ops-console",
+            score: 88,
+            note: "Citelne alarmy."
+          }]
+        };
+      }
+
+      throw new Error(`Unexpected query: ${compactSql}`);
+    }
+  };
+  const app = loadAppWithPool(fakePool);
+  const response = await request(app, "/api/results", {
+    headers: { "x-admin-token": "0123456789abcdef0123456789abcdef" }
+  });
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.submissionCount, 2);
+  assert.deepEqual(body.ageCounts, { "35-44": 2 });
+  assert.deepEqual(body.feedback, [{
+    submission_id: 1,
+    age_range: "35-44",
+    created_at: "2026-06-20T12:00:00.000Z",
+    updated_at: "2026-06-20T12:00:00.000Z",
+    design_id: "industrial-ops-console",
+    score: 88,
+    note: "Citelne alarmy.",
+    title: "Industrial Ops Console",
+    iteration: "01"
+  }]);
 });
 
 test("submission endpoint rejects non-json and malformed json", async () => {
