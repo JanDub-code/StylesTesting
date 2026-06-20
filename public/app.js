@@ -87,9 +87,8 @@ elements.form.addEventListener("submit", async (event) => {
       body: JSON.stringify(payload)
     });
 
-    const data = await response.json().catch(() => ({}));
     if (!response.ok) {
-      throw new Error(data.details?.join(" ") || data.error || "Hodnocení se nepodařilo uložit.");
+      throw new Error(getSubmitErrorMessage(response.status));
     }
 
     saveDraft();
@@ -237,6 +236,14 @@ function buildMissingText(missingAge, missingScores) {
     parts.push(`${missingScores} skóre`);
   }
   return `Chybí: ${parts.join(", ")}.`;
+}
+
+function getSubmitErrorMessage(status) {
+  if (status === 400) {
+    return "Zkontrolujte prosím věkovou kategorii a skóre u všech návrhů.";
+  }
+
+  return "Hodnocení se teď nepodařilo uložit. Zkuste to prosím později.";
 }
 
 function canSubmit() {

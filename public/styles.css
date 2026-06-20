@@ -358,12 +358,6 @@ input[type="range"] {
   color: var(--muted);
 }
 
-.admin-link {
-  color: var(--primary);
-  font-weight: 800;
-  white-space: nowrap;
-}
-
 .submit-bar {
   display: flex;
   justify-content: space-between;

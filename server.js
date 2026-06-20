@@ -28,11 +28,7 @@ for (const design of DESIGNS) {
 }
 
 app.get("/api/health", (_req, res) => {
-  res.json({
-    ok: true,
-    databaseConfigured: Boolean(pool),
-    adminConfigured: Boolean(adminToken)
-  });
+  res.json({ ok: true });
 });
 
 app.get("/api/designs", (_req, res) => {
@@ -52,14 +48,16 @@ app.get("/api/designs", (_req, res) => {
 app.post("/api/submissions", async (req, res, next) => {
   if (!pool) {
     res.status(503).json({
-      error: "Ukladani neni nakonfigurovano. Nastavte DATABASE_URL pro PostgreSQL."
+      error: "Hodnoceni se ted nepodarilo ulozit. Zkuste to prosim pozdeji."
     });
     return;
   }
 
   const validation = validateSubmission(req.body || {});
   if (!validation.valid) {
-    res.status(400).json({ error: "Neplatne hlasovani.", details: validation.errors });
+    res.status(400).json({
+      error: "Hodnoceni neni kompletni. Zkontrolujte vekovou kategorii a skore u vsech navrhu."
+    });
     return;
   }
 
