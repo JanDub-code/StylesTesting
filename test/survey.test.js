@@ -24,6 +24,19 @@ test("validateSubmission requires age and all six design scores", () => {
   assert.ok(invalid.errors.some((error) => error.includes("6 navrhu")));
 });
 
+test("validateSubmission rejects malformed payloads without throwing", () => {
+  assert.doesNotThrow(() => validateSubmission(null));
+
+  const invalid = validateSubmission({
+    clientId: "client-1",
+    ageRange: "25-34",
+    scores: [null, "bad", 42, ...DESIGNS.slice(3).map((design) => ({ designId: design.id, score: 50 }))]
+  });
+
+  assert.equal(invalid.valid, false);
+  assert.ok(invalid.errors.some((error) => error.includes("Neznamy navrh")));
+});
+
 test("validateSubmission accepts a complete anonymous vote", () => {
   const payload = {
     clientId: "client-1",
