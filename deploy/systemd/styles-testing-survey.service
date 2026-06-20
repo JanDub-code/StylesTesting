@@ -1,0 +1,36 @@
+[Unit]
+Description=Styles Testing Survey Node.js app
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+User=styles-survey
+Group=styles-survey
+WorkingDirectory=/opt/styles-testing-survey/current
+Environment=NODE_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/etc/styles-testing-survey.env
+ExecStart=/usr/bin/env node server.js
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+
+# Basic systemd hardening. The app does not need to write to disk.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+LockPersonality=true
+SystemCallArchitectures=native
+CapabilityBoundingSet=
+AmbientCapabilities=
+
+[Install]
+WantedBy=multi-user.target

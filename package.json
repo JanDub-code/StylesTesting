@@ -7,7 +7,9 @@
   "scripts": {
     "start": "node server.js",
     "test": "node --test",
-    "check": "node --check server.js && node --check lib/survey.js && node --check public/app.js && node --check public/admin.js"
+    "check": "node --check server.js && node --check lib/survey.js && node --check public/app.js && node --check public/admin.js",
+    "deploy": "bash scripts/deploy.sh",
+    "deploy:nginx": "bash scripts/install-nginx.sh"
   },
   "dependencies": {
     "express": "^4.19.2",

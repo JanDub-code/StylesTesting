@@ -1,3 +1,4 @@
+const crypto = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
 const express = require("express");
@@ -6,25 +7,54 @@ const { AGE_RANGES, DESIGNS, validateSubmission, csvEscape } = require("./lib/su
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
-const adminToken = process.env.ADMIN_TOKEN || "";
+const listenHost = (process.env.HOST || "").trim();
+const adminToken = (process.env.ADMIN_TOKEN || "").trim();
 const databaseUrl = process.env.DATABASE_URL || "";
 const rootDir = __dirname;
+const enforceHttpsEnabled = isEnabled(process.env.ENFORCE_HTTPS);
+const allowedHosts = parseList(process.env.ALLOWED_HOSTS).map((allowedHost) => allowedHost.toLowerCase());
+
+configureTrustProxy(app, process.env.TRUST_PROXY);
 
 let pool = null;
 
 if (databaseUrl) {
   pool = new Pool({
     connectionString: databaseUrl,
-    ssl: process.env.PGSSLMODE === "require" ? { rejectUnauthorized: false } : undefined
+    ssl: buildPgSslConfig()
   });
 }
 
+const submissionRateLimit = createRateLimiter({
+  windowMs: 60 * 60 * 1000,
+  max: parseNonNegativeInteger(process.env.SUBMISSION_RATE_LIMIT, 30),
+  message: "Prilis mnoho odeslani z jedne IP adresy. Zkuste to prosim pozdeji."
+});
+const adminRateLimit = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: parseNonNegativeInteger(process.env.ADMIN_RATE_LIMIT, 60),
+  message: "Prilis mnoho admin pozadavku. Zkuste to prosim pozdeji."
+});
+
 app.disable("x-powered-by");
-app.use(express.json({ limit: "80kb" }));
-app.use(express.static(path.join(rootDir, "public"), { extensions: ["html"] }));
+app.use(validateHost);
+app.use(enforceHttps);
+app.use(securityHeaders);
+app.use("/api/submissions", submissionRateLimit);
+app.use(["/api/results", "/api/export.csv"], adminRateLimit);
+app.use(express.json({ limit: "80kb", type: isJsonContentType }));
+app.use(express.static(path.join(rootDir, "public"), {
+  extensions: ["html"],
+  dotfiles: "deny",
+  index: "index.html"
+}));
 
 for (const design of DESIGNS) {
-  app.use(`/designs/${design.folder}`, express.static(path.join(rootDir, design.folder), { extensions: ["html"] }));
+  app.use(`/designs/${design.folder}`, express.static(path.join(rootDir, design.folder), {
+    extensions: ["html"],
+    dotfiles: "deny",
+    index: "index.html"
+  }));
 }
 
 app.get("/api/health", (_req, res) => {
@@ -45,7 +75,7 @@ app.get("/api/designs", (_req, res) => {
   });
 });
 
-app.post("/api/submissions", async (req, res, next) => {
+app.post("/api/submissions", requireJson, async (req, res, next) => {
   if (!pool) {
     res.status(503).json({
       error: "Hodnoceni se ted nepodarilo ulozit. Zkuste to prosim pozdeji."
@@ -202,13 +232,16 @@ app.get("/admin", (_req, res) => {
 });
 
 function requireAdmin(req, res, next) {
+  res.setHeader("cache-control", "no-store");
+  res.vary("x-admin-token");
+
   if (!adminToken) {
     res.status(503).json({ error: "ADMIN_TOKEN neni nastaven." });
     return;
   }
 
-  const token = req.get("x-admin-token") || req.query.token;
-  if (token !== adminToken) {
+  const token = req.get("x-admin-token") || "";
+  if (!safeTokenEquals(token, adminToken)) {
     res.status(401).json({ error: "Neplatny admin token." });
     return;
   }
@@ -227,7 +260,289 @@ async function ensureSchema() {
   await pool.query(schemaSql);
 }
 
+function buildPgSslConfig() {
+  if (process.env.PGSSLMODE !== "require") {
+    return undefined;
+  }
+
+  const sslConfig = {
+    rejectUnauthorized: process.env.PGSSLREJECTUNAUTHORIZED === "false" ? false : true
+  };
+  const caFile = process.env.PGSSLCAFILE || process.env.PGSSLROOTCERT;
+  if (caFile) {
+    sslConfig.ca = fs.readFileSync(path.resolve(caFile), "utf8");
+  }
+
+  return sslConfig;
+}
+
+function configureTrustProxy(expressApp, value) {
+  const normalized = typeof value === "string" ? value.trim().toLowerCase() : "";
+  if (!normalized || ["0", "false", "no", "off"].includes(normalized)) {
+    return;
+  }
+
+  if (/^\d+$/.test(normalized)) {
+    expressApp.set("trust proxy", Number(normalized));
+    return;
+  }
+
+  if (["true", "yes", "on"].includes(normalized)) {
+    expressApp.set("trust proxy", 1);
+    return;
+  }
+
+  expressApp.set("trust proxy", normalized);
+}
+
+function validateHost(req, res, next) {
+  if (allowedHosts.length === 0) {
+    next();
+    return;
+  }
+
+  const hostInfo = getHostInfo(req);
+  if (hostInfo && allowedHosts.includes(hostInfo.hostname)) {
+    next();
+    return;
+  }
+
+  res.status(400).type("text/plain").send("Neplatny host.\n");
+}
+
+function enforceHttps(req, res, next) {
+  if (!enforceHttpsEnabled || req.secure) {
+    next();
+    return;
+  }
+
+  const hostInfo = getHostInfo(req);
+  if (!hostInfo) {
+    res.status(400).type("text/plain").send("Neplatny host.\n");
+    return;
+  }
+
+  res.redirect(308, `https://${hostInfo.host}${req.originalUrl}`);
+}
+
+function getHostInfo(req) {
+  const host = req.get("host");
+  if (typeof host !== "string" || !host || /[\s/@?#\\]/.test(host)) {
+    return null;
+  }
+
+  const normalized = host.toLowerCase();
+  let hostname = "";
+  let portSuffix = "";
+
+  if (normalized.startsWith("[")) {
+    const bracketIndex = normalized.indexOf("]");
+    if (bracketIndex <= 1) {
+      return null;
+    }
+
+    hostname = normalized.slice(1, bracketIndex);
+    const rest = normalized.slice(bracketIndex + 1);
+    if (rest) {
+      if (!rest.startsWith(":")) {
+        return null;
+      }
+
+      const port = normalizePort(rest.slice(1));
+      if (!port) {
+        return null;
+      }
+      portSuffix = `:${port}`;
+    }
+
+    if (!hostname.includes(":") || !/^[0-9a-f:.]+$/.test(hostname)) {
+      return null;
+    }
+
+    return {
+      host: `[${hostname}]${portSuffix}`,
+      hostname
+    };
+  }
+
+  const parts = normalized.split(":");
+  if (parts.length > 2) {
+    return null;
+  }
+
+  hostname = parts[0];
+  if (!hostname || !/^[a-z0-9.-]+$/.test(hostname)) {
+    return null;
+  }
+
+  if (parts.length === 2) {
+    const port = normalizePort(parts[1]);
+    if (!port) {
+      return null;
+    }
+    portSuffix = `:${port}`;
+  }
+
+  return {
+    host: `${hostname}${portSuffix}`,
+    hostname
+  };
+}
+
+function normalizePort(value) {
+  if (!/^\d{1,5}$/.test(value)) {
+    return "";
+  }
+
+  const port = Number(value);
+  if (port < 1 || port > 65535) {
+    return "";
+  }
+
+  return String(port);
+}
+
+function securityHeaders(req, res, next) {
+  const csp = [
+    "default-src 'self'",
+    "script-src 'self'",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "img-src 'self' data: https://images.unsplash.com",
+    "font-src 'self' data: https://fonts.gstatic.com",
+    "connect-src 'self'",
+    "frame-src 'self'",
+    "frame-ancestors 'self'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "object-src 'none'"
+  ].join("; ");
+
+  res.setHeader("content-security-policy", csp);
+  res.setHeader("cross-origin-opener-policy", "same-origin");
+  res.setHeader("cross-origin-resource-policy", "same-origin");
+  res.setHeader("permissions-policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
+  res.setHeader("referrer-policy", "same-origin");
+  res.setHeader("x-content-type-options", "nosniff");
+  res.setHeader("x-frame-options", "SAMEORIGIN");
+
+  if (req.secure) {
+    res.setHeader("strict-transport-security", "max-age=15552000; includeSubDomains");
+  }
+
+  if (req.path === "/admin" || req.path === "/admin.html" || req.path.startsWith("/api/results") || req.path.startsWith("/api/export")) {
+    res.setHeader("x-robots-tag", "noindex, nofollow");
+  }
+
+  next();
+}
+
+function requireJson(req, res, next) {
+  if (!isJsonContentType(req)) {
+    res.status(415).json({ error: "Pozadavek musi byt JSON." });
+    return;
+  }
+
+  next();
+}
+
+function isJsonContentType(req) {
+  const contentType = req.headers["content-type"];
+  if (typeof contentType !== "string") {
+    return false;
+  }
+
+  const mediaType = contentType.split(";", 1)[0].trim().toLowerCase();
+  return mediaType === "application/json" || (mediaType.startsWith("application/") && mediaType.endsWith("+json"));
+}
+
+function createRateLimiter({ windowMs, max, message }) {
+  const hits = new Map();
+  const limit = Number.isFinite(max) ? Math.max(0, max) : 0;
+
+  return (req, res, next) => {
+    if (limit === 0) {
+      next();
+      return;
+    }
+
+    const now = Date.now();
+    const key = req.ip || req.socket.remoteAddress || "unknown";
+    let bucket = hits.get(key);
+    if (!bucket || bucket.resetAt <= now) {
+      bucket = { count: 0, resetAt: now + windowMs };
+      hits.set(key, bucket);
+    }
+
+    bucket.count += 1;
+    const remaining = Math.max(0, limit - bucket.count);
+    const resetSeconds = Math.ceil((bucket.resetAt - now) / 1000);
+    res.setHeader("RateLimit-Limit", String(limit));
+    res.setHeader("RateLimit-Remaining", String(remaining));
+    res.setHeader("RateLimit-Reset", String(resetSeconds));
+
+    if (hits.size > 10000) {
+      for (const [bucketKey, value] of hits) {
+        if (value.resetAt <= now) {
+          hits.delete(bucketKey);
+        }
+      }
+    }
+
+    if (bucket.count > limit) {
+      res.setHeader("Retry-After", String(resetSeconds));
+      res.status(429).json({ error: message });
+      return;
+    }
+
+    next();
+  };
+}
+
+function safeTokenEquals(received, expected) {
+  if (typeof received !== "string" || typeof expected !== "string") {
+    return false;
+  }
+
+  const receivedDigest = crypto.createHash("sha256").update(received, "utf8").digest();
+  const expectedDigest = crypto.createHash("sha256").update(expected, "utf8").digest();
+  return crypto.timingSafeEqual(receivedDigest, expectedDigest);
+}
+
+function parseList(value) {
+  if (!value) {
+    return [];
+  }
+
+  return String(value)
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function isEnabled(value) {
+  return ["1", "true", "yes", "on"].includes(String(value || "").toLowerCase());
+}
+
+function parseNonNegativeInteger(value, fallback) {
+  const parsed = Number(value);
+  if (Number.isInteger(parsed) && parsed >= 0) {
+    return parsed;
+  }
+
+  return fallback;
+}
+
 app.use((error, _req, res, _next) => {
+  if (error.type === "entity.too.large") {
+    res.status(413).json({ error: "Pozadavek je prilis velky." });
+    return;
+  }
+
+  if (error instanceof SyntaxError && error.status === 400 && "body" in error) {
+    res.status(400).json({ error: "Neplatny JSON." });
+    return;
+  }
+
   console.error(error);
   res.status(500).json({ error: "Serverova chyba." });
 });
@@ -235,9 +550,24 @@ app.use((error, _req, res, _next) => {
 if (require.main === module) {
   ensureSchema()
     .then(() => {
-      app.listen(port, () => {
-        console.log(`Anketa bezi na http://localhost:${port}`);
-      });
+      const server = listenHost
+        ? app.listen(port, listenHost, () => {
+            console.log(`Anketa bezi na http://${listenHost}:${port}`);
+          })
+        : app.listen(port, () => {
+            console.log(`Anketa bezi na http://localhost:${port}`);
+          });
+
+      const shutdown = () => {
+        server.close(async () => {
+          if (pool) {
+            await pool.end().catch(() => {});
+          }
+          process.exit(0);
+        });
+      };
+      process.once("SIGTERM", shutdown);
+      process.once("SIGINT", shutdown);
     })
     .catch((error) => {
       console.error("Nepodarilo se pripravit databazi.", error);
