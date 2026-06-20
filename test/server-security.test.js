@@ -56,7 +56,16 @@ test("responses include baseline security headers", async () => {
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   assert.equal(response.headers.get("x-frame-options"), "SAMEORIGIN");
+  assert.equal(response.headers.get("cross-origin-resource-policy"), "same-origin");
   assert.match(response.headers.get("content-security-policy"), /default-src 'self'/);
+});
+
+test("design preview assets can load inside the opaque sandboxed iframe", async () => {
+  const app = loadApp();
+  const response = await request(app, "/designs/iterace-01-industrial-ops-console/app.js");
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("cross-origin-resource-policy"), "cross-origin");
 });
 
 test("allowed host checks ignore spoofed forwarded host", async () => {

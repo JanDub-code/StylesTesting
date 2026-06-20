@@ -483,6 +483,7 @@ function normalizePort(value) {
 }
 
 function securityHeaders(req, res, next) {
+  const crossOriginResourcePolicy = req.path.startsWith("/designs/") ? "cross-origin" : "same-origin";
   const csp = [
     "default-src 'self'",
     "script-src 'self'",
@@ -499,7 +500,7 @@ function securityHeaders(req, res, next) {
 
   res.setHeader("content-security-policy", csp);
   res.setHeader("cross-origin-opener-policy", "same-origin");
-  res.setHeader("cross-origin-resource-policy", "same-origin");
+  res.setHeader("cross-origin-resource-policy", crossOriginResourcePolicy);
   res.setHeader("permissions-policy", "camera=(), microphone=(), geolocation=(), payment=(), usb=()");
   res.setHeader("referrer-policy", "same-origin");
   res.setHeader("x-content-type-options", "nosniff");
