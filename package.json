@@ -1,0 +1,17 @@
+{
+  "name": "styles-testing-survey",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Jednoducha anketa pro hodnoceni sesti designovych iteraci.",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test",
+    "check": "node --check server.js && node --check lib/survey.js && node --check public/app.js && node --check public/admin.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.12.0"
+  },
+  "devDependencies": {}
+}

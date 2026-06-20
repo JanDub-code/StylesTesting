@@ -3,16 +3,16 @@
     revize: {
       label: "Revize & zařízení",
       short: "Revize",
-      meta: "27 otevřených věcí",
-      count: "27",
+      meta: "12 aktivních revizí",
+      count: "12",
       status: "3 urgentní",
       description: "Přehled zařízení, revizních lhůt, techniků a urgentních protokolů."
     },
     skoleni: {
       label: "Školení elektro",
       short: "Školení",
-      meta: "12 lidí v běhu",
-      count: "12",
+      meta: "7 techniků v běhu",
+      count: "7",
       status: "4 expirace",
       description: "Termíny školení, certifikáty, expirace a potvrzení účasti pro elektro tým."
     },
@@ -27,8 +27,8 @@
     lide: {
       label: "Lidé & smlouvy",
       short: "Lidé",
-      meta: "8 podpisových kroků",
-      count: "8",
+      meta: "3 podpisové kroky",
+      count: "3",
       status: "2 nástupy",
       description: "Osoby, smlouvy, role, dodavatelé a podpisy bez dlouhého menu."
     },

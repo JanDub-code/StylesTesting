@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin výsledky ankety</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="survey-shell admin-shell">
+      <section class="intro-panel" aria-labelledby="adminTitle">
+        <div>
+          <p class="eyebrow">Admin</p>
+          <h1 id="adminTitle">Výsledky ankety designů</h1>
+          <p class="lead">Souhrn je chráněný admin tokenem. Veřejná anketa globální výsledky nezobrazuje.</p>
+        </div>
+        <a class="secondary-button" href="/">Zpět na anketu</a>
+      </section>
+
+      <form class="admin-token-panel" id="tokenForm">
+        <label>
+          <span>Admin token</span>
+          <input id="adminToken" type="password" autocomplete="current-password" placeholder="ADMIN_TOKEN" required />
+        </label>
+        <button class="primary-button" type="submit">Načíst výsledky</button>
+        <button class="secondary-button" id="exportCsv" type="button" disabled>Stáhnout CSV</button>
+      </form>
+
+      <section class="results-grid" id="results" hidden>
+        <article class="result-card">
+          <span>Počet odeslání</span>
+          <strong id="submissionCount">0</strong>
+          <small id="generatedAt">-</small>
+        </article>
+        <article class="result-card result-card--wide">
+          <h2>Průměr podle návrhu</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Návrh</th>
+                  <th>Hlasů</th>
+                  <th>Průměr</th>
+                  <th>Min</th>
+                  <th>Max</th>
+                </tr>
+              </thead>
+              <tbody id="summaryRows"></tbody>
+            </table>
+          </div>
+        </article>
+        <article class="result-card result-card--wide">
+          <h2>Rozpad podle věku</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Návrh</th>
+                  <th>Věk</th>
+                  <th>Hlasů</th>
+                  <th>Průměr</th>
+                </tr>
+              </thead>
+              <tbody id="ageRows"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script src="/admin.js"></script>
+  </body>
+</html>

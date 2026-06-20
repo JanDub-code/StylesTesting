@@ -3,7 +3,7 @@ const tasks = [
     id: "elektro-nordic-mall",
     avatar: "NM",
     title: "Elektro revize pasáže",
-    customer: "Nordic Mall",
+    customer: "CSELMONT HQ",
     time: "9:30",
     window: "dnes 9:30–11:00",
     type: "Elektro",

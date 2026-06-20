@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="cs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Anketa designů Evidence revizí</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="survey-shell">
+      <section class="intro-panel" aria-labelledby="pageTitle">
+        <div>
+          <p class="eyebrow">Anketa · 6 návrhů · 0-100 bodů</p>
+          <h1 id="pageTitle">Ohodnoťte styl aplikace Evidence revizí</h1>
+          <p class="lead">
+            Prohlédněte si každý návrh a dejte mu vlastní skóre. Výsledky se ukládají anonymně
+            podle věkové kategorie, aby bylo vidět, který směr je srozumitelný pro různé skupiny.
+          </p>
+        </div>
+        <div class="progress-card" aria-live="polite">
+          <span>Hotovo</span>
+          <strong id="progressValue">0 / 6</strong>
+          <small id="progressHint">Vyberte věk a ohodnoťte všech šest návrhů.</small>
+        </div>
+      </section>
+
+      <section class="age-panel" aria-labelledby="ageTitle">
+        <div class="section-heading">
+          <h2 id="ageTitle">Věková kategorie</h2>
+          <p>Nezadává se jméno, e-mail ani přesné datum narození.</p>
+        </div>
+        <div class="age-grid" id="ageGrid" role="radiogroup" aria-label="Věková kategorie"></div>
+      </section>
+
+      <form class="design-list" id="surveyForm" novalidate>
+        <div class="section-heading section-heading--wide">
+          <div>
+            <h2>Hodnocení návrhů</h2>
+            <p>Každý návrh má samostatné skóre od 0 do 100 bodů. Poznámka je volitelná.</p>
+          </div>
+          <a class="admin-link" href="/admin">Admin výsledky</a>
+        </div>
+
+        <div id="designCards" class="cards-grid" aria-live="polite"></div>
+
+        <div class="submit-bar">
+          <div>
+            <strong id="submitTitle">Ještě není vyplněno</strong>
+            <span id="submitDetail">Chybí věková kategorie a skóre u návrhů.</span>
+          </div>
+          <button class="primary-button" id="submitButton" type="submit" disabled>Odeslat hodnocení</button>
+        </div>
+      </form>
+
+      <section class="thank-you" id="thankYou" hidden>
+        <div>
+          <p class="eyebrow">Odesláno</p>
+          <h2>Děkujeme za hodnocení.</h2>
+          <p>Globální výsledky se nezobrazují veřejně, aby neovlivňovaly další hlasující.</p>
+        </div>
+        <ol id="personalRanking" class="ranking-list"></ol>
+        <button class="secondary-button" id="editAgainButton" type="button">Upravit moje hodnocení</button>
+      </section>
+    </main>
+
+    <div class="preview-modal" id="previewModal" hidden>
+      <div class="preview-toolbar">
+        <div>
+          <span id="previewKicker">Náhled návrhu</span>
+          <strong id="previewTitle">Design</strong>
+        </div>
+        <div class="preview-actions">
+          <a class="secondary-button" id="openNewTab" href="/" target="_blank" rel="noreferrer">Otevřít v nové kartě</a>
+          <button class="secondary-button" id="closePreview" type="button">Zavřít</button>
+        </div>
+      </div>
+      <iframe id="previewFrame" title="Náhled designu"></iframe>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>
