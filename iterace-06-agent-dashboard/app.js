@@ -172,7 +172,7 @@ const modules = [
   {
     id: "reporting",
     name: "Reporting & export",
-    subtitle: "Přehledy a exporty TIČR/OIP",
+    subtitle: "Přehledy a exporty pro kontrolní orgány",
     description: "Manažerské přehledy, provozní statistiky a exporty pro kontrolní orgány.",
     status: "active",
     accentColor: "violet",

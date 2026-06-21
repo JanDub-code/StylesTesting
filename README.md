@@ -1,4 +1,4 @@
-# Anketa designu Evidence revizi
+# Anketa designu demo aplikace
 
 Jednoducha Node/Express appka pro pseudonymni hodnoceni sesti statickych designovych iteraci.
 

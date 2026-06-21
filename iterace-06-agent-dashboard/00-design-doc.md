@@ -1,4 +1,4 @@
-# Iterace 06 — Kimi Agent Dashboard
+# Iterace 06 — Agent Dashboard
 
 ## Status
 
@@ -14,11 +14,11 @@ Soubory prototypu v této iteraci:
 
 ## Základní idea
 
-Původní Kimi dashboard je převedený do stejného formátu jako ostatní iterace: jedna statická složka, jeden HTML prototyp a jeden design dokument. Styl testuje **modulární agentní pracovní plochu** pro revizní firmu — ne čistý bento launcher, ale produktový dashboard, který ukazuje priority dne, vybrané moduly a jejich nastavení.
+Původní agentní dashboard je převedený do stejného formátu jako ostatní iterace: jedna statická složka, jeden HTML prototyp a jeden design dokument. Styl testuje **modulární agentní pracovní plochu** pro demo firmu — ne čistý bento launcher, ale produktový dashboard, který ukazuje priority dne, vybrané moduly a jejich nastavení.
 
 Vhodné pro ověření otázky:
 
-> Může Evidence revizí působit jako moderní agentní cockpit, který drží každodenní moduly pohromadě a přitom neschovává urgentní provozní práci?
+> Může demo aplikace působit jako moderní agentní cockpit, který drží každodenní moduly pohromadě a přitom neschovává urgentní provozní práci?
 
 ## Vizuální charakter
 
@@ -44,7 +44,7 @@ Vhodné pro ověření otázky:
 
 ### Rohy a ořezávání
 
-Tato iterace navazuje na původní Kimi UI a používá **velké měkké radiusy** bez clip-path efektů.
+Tato iterace navazuje na původní agentní UI a používá **velké měkké radiusy** bez clip-path efektů.
 
 - Sidebar: `28px`.
 - Hero a priority karty: `32px`.

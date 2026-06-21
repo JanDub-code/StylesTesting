@@ -26,7 +26,7 @@ const riskDetails = {
     severityClass: "danger",
     lead: "2 revize jsou po termínu, nejstarší položka překračuje SLA o 6 dnů. Priorita je přesunout kapacity z méně rizikových zakázek.",
     code: "R-142",
-    owner: "Marek L.",
+    owner: "Osoba A",
     due: "Dnes 15:00",
   },
   invalid: {
@@ -35,7 +35,7 @@ const riskDetails = {
     severityClass: "danger",
     lead: "6 zařízení nemá platnou revizi. Dvě položky jsou ve výrobním provozu a vyžadují potvrzení bezpečného režimu.",
     code: "Z-087",
-    owner: "Petr H.",
+    owner: "Osoba B",
     due: "Dnes 12:30",
   },
   defects: {
@@ -44,7 +44,7 @@ const riskDetails = {
     severityClass: "warning",
     lead: "7 závad třídy A čeká na akci. U tří položek chybí vlastník a v 15:00 proběhne automatická eskalace.",
     code: "A-031",
-    owner: "Dana M.",
+    owner: "Osoba C",
     due: "Dnes 15:00",
   },
   protocols: {
@@ -53,7 +53,7 @@ const riskDetails = {
     severityClass: "warning",
     lead: "3 protokoly nejsou kompletní. Většina čeká na podpis klienta nebo upload fotodokumentace z terénu.",
     code: "P-224",
-    owner: "Jana K.",
+    owner: "Osoba D",
     due: "Zítra 09:00",
   },
   permits: {
@@ -62,7 +62,7 @@ const riskDetails = {
     severityClass: "ok",
     lead: "Žádné kritické oprávnění není expirované. Dvě certifikace vstoupí do třicetidenního okna obnovy.",
     code: "L-019",
-    owner: "Adam V.",
+    owner: "Osoba E",
     due: "30 dnů",
   },
 };

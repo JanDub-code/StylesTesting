@@ -19,7 +19,7 @@ Revizní systém jako **provozní velín**. Vizuálně má působit jako nástro
 
 Vhodné pro ověření otázky:
 
-> Může Evidence revizí působit jako profesionální operační centrum, ne jako běžný admin panel?
+> Může demo aplikace působit jako profesionální operační centrum, ne jako běžný admin panel?
 
 ## Vizuální charakter
 
